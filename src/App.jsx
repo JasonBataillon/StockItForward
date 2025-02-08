@@ -5,6 +5,7 @@ import "./App.css";
 import Register from "./components/register";
 import Login from "./components/login";
 import Navbar from "./components/navbar";
+import StockCharts from "./components/stockChart";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<div>Welcome to Stock-It</div>} />
+          <Route path="/stockCharts" element={<StockCharts />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>
