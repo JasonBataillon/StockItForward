@@ -1,3 +1,9 @@
+//Note: A lot of this is subject to change in the future.
+//Such as, we may decide to make the call from our own
+//database that has the stored data instead.
+//If we keep this method of doing this, we may want to
+//allow more options for the user to select to view data.
+
 import React, { useEffect, useState } from "react";
 //https://recharts.org/en-US/
 //See guide there
@@ -12,7 +18,7 @@ import {
 //Axios for API calls
 import axios from "axios";
 
-const StockCharts = ({ symbol }) => {
+const StockCharts = () => {
   const [data, setData] = useState([]); //declaring hook for data storage
   const [loading, setLoading] = useState(true); //declaring hook to indicate whether app is working instead of blank screening
   //   const API_KEY = import.process.env.REACT_APP_POLYGON_API_KEY; //Get the API key from environment variable
@@ -36,17 +42,23 @@ const StockCharts = ({ symbol }) => {
   useEffect(() => {
     const fetchStockData = async () => {
       try {
+        //When moving to allow user to control these, we may need to have these values passed as props
+        const stocksTicker = "AAPL"; // Change this to get different stock
+        const multiplier = 1; // Change this to get different time scale
+        const timespan = "day"; // day, week, month, quarter, year
+        const from = "2023-01-01"; // starting YEAR-MO-DA
+        const to = "2023-12-31"; // ending YEAR-MO-DA
         const response = await axios.get(
-          `https://api.polygon.io/v2/aggs/ticker/${symbol}/range/1/day/2023-01-01/2023-12-31`,
+          //url can be controlled by what stock by the content between
+
+          `https://api.polygon.io/v2/aggs/ticker/${stocksTicker}/range/${multiplier}/${timespan}/${from}/${to}`,
           {
-            params: {},
-            adjusted: true,
-            sort: "asc",
-            limit: 30,
-            apiKey: API_KEY,
+            params: { adjusted: true, sort: "asc", limit: 30, apiKey: API_KEY },
           }
         );
+
         const json = response.data; //Take the data from Axios into the json
+        //console.log(json); //Log the json data
 
         if (json.results) {
           //Format the data for chart to read
@@ -54,6 +66,8 @@ const StockCharts = ({ symbol }) => {
             date: new Date(item.t).toLocaleDateString(), // Convert timestamp to date string
             close: item.c, // Closing price
           }));
+          //console.log(formattedData);
+
           setData(formattedData); //Set the data to the formatted data}
         }
       } catch (error) {
@@ -64,7 +78,7 @@ const StockCharts = ({ symbol }) => {
       }
     };
     fetchStockData(); //run that useEffect function above
-  }, [symbol, API_KEY]);
+  }, [API_KEY]);
 
   //Does the loading message thing while fetching
   if (loading) {
@@ -81,15 +95,16 @@ const StockCharts = ({ symbol }) => {
     <div>
       <h1>Stock Charts</h1>
       <LineChart
-        width={400}
-        height={400}
+        width={800}
+        height={800}
         data={data}
-        margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
+        margin={{ top: 20, right: 20, bottom: 5, left: 0 }}
       >
-        <Line type="monotone" dataKey="uv" stroke="#8884d8" />
+        <Line type="monotone" dataKey="close" stroke="#8884d8" />
         <CartesianGrid stroke="#ccc" strokeWidth={1} />
-        <XAxis dataKey="name" />
-        <YAxis />
+        <XAxis dataKey="date" />
+        <YAxis domain={["auto", "dataMax + 5", "dataMin - 5"]} />{" "}
+        {/* Adds space to top of graph*/}
         <Tooltip />
       </LineChart>
     </div>
