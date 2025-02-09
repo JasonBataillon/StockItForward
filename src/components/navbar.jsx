@@ -9,6 +9,10 @@ const Navbar = () => {
           <Link to="/">Home</Link> {/* Link to Home page */}
         </li>
         <li>
+          <Link to="/stockList">Stock List</Link>{" "}
+          {/* Link to Stock List page */}
+        </li>
+        <li>
           <Link to={"/stockCharts"}>Stock Charts</Link>{" "}
           {/* Link to Stock Charts page */}
         </li>
