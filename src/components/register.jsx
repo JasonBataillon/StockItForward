@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { usePostUserMutation } from "./usersSlice";
 
 const Register = () => {
+  const [postUser] = usePostUserMutation();
   // This state holds the form data: email and password
   const [formData, setFormData] = useState({
     username: "",
@@ -28,24 +30,19 @@ const Register = () => {
       return;
     }
     try {
-      const response = await fetch("http://localhost:5173/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        }),
+      const response = await postUser({
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
       });
+      console.log(response);
+      console.log(response.error);
+      // console.log(response.error.data);
+      // if (response.error) {
+      //   throw new Error(response.error.data.message || "Registration failed");
+      // }
 
-      if (!response.ok) {
-        throw new Error("Registration failed");
-      }
-
-      const data = await response.json();
-      console.log("User registered:", data);
+      console.log("User registered:", response.data);
       setMessage("Registration successful!");
     } catch (error) {
       console.error("Error:", error);
@@ -103,11 +100,12 @@ const Register = () => {
         </div>
 
         {/* Submit Button */}
-        <button type="submit">Register</button>
+        <button type="submit" onClick={handleSubmit}>
+          Register
+        </button>
         <p>{message}</p>
       </form>
     </div>
   );
 };
-
 export default Register;

@@ -16,7 +16,7 @@ import {
   Tooltip,
 } from "recharts";
 //Axios for API calls
-import axios from "axios";
+// import axios from "axios";
 
 const StockCharts = () => {
   const [data, setData] = useState([]); //declaring hook for data storage
