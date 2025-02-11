@@ -1,4 +1,14 @@
+# StockItForward
+
+=======
+
 # React + Vite
+
+Components:
+Login - In review
+Register - in review
+Navbar - Update as go
+stockChart - functional: ready for customizing
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
