@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const StockList = () => {
+const StockList = ({ query }) => {
   console.log("StockList");
   const [stocks, setStocks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
 
-  const fetchStocks = async (passedSearchTerm) => {
+  const fetchStocks = async (query) => {
     setLoading(true); //just makes it display loading message while working
     try {
       //import APIKey from .env
@@ -22,7 +21,7 @@ const StockList = () => {
             market: "stocks", // stocks, crypto, forex
             active: true, //true for only the active stocks
             limit: 25, // How many stocks that will be got
-            search: passedSearchTerm,
+            search: query,
           },
         }
       );
@@ -39,8 +38,8 @@ const StockList = () => {
   };
   //https://polygon.io/docs/stocks/get_v3_reference_tickers
   useEffect(() => {
-    fetchStocks(searchTerm);
-  }, [searchTerm]);
+    fetchStocks();
+  }, [query]);
   //standard loading and error indicators
   if (loading) {
     return <div>Loading...</div>;
@@ -49,23 +48,15 @@ const StockList = () => {
     return <div>Error: {error}</div>;
   }
 
-  //need to work out getting the function call happen only when search button is pressed instead of onChange of input
+  //   //need to work out getting the function call happen only when search button is pressed instead of onChange of input
+  //   const handleSearch = () => {
+  //     fetchStocks(searchTerm);
+  //   };
+
   return (
     <div>
       <h1>Stocks</h1>
-      <input
-        type="text"
-        placeholder="Search..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      <button
-        onClick={() => {
-          fetchStocks(searchTerm);
-        }}
-      >
-        Search
-      </button>
+
       {loading && <p>Loading...</p>}
       {error && <p>Error: {error}.</p>}
       <ul>
