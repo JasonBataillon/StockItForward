@@ -2,29 +2,49 @@ import React, { useState } from "react";
 
 // Define the Login component
 const Login = () => {
-  // State to hold email and password input values
-  const [email, setEmail] = useState("");
+  // State to hold username and password input values
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
+  const [message, setMessage] = useState("");
   // Handler for form submission
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent the default form submission behavior
     // Here you would typically handle the login logic, such as sending the data to your server
-    console.log("Email:", email);
-    console.log("Password:", password);
+    try {
+      const response = await fetch("http://localhost:5173/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+
+      const data = response.json();
+      console.log("Login successful:", data);
+      setMessage("Login successful!");
+    } catch (error) {
+      console.error("Error:", error);
+      setMessage("Login failed.");
+    }
   };
 
   return (
     <div>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
-        {/* Email input field */}
+        {/* username input field */}
         <div>
-          <label>Email:</label>
+          <label>Username:</label>
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>
@@ -40,6 +60,7 @@ const Login = () => {
         </div>
         {/* Submit button */}
         <button type="submit">Login</button>
+        <p>{message}</p>
       </form>
     </div>
   );
