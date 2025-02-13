@@ -1,14 +1,14 @@
-import api from "../api/api.js";
+import { api } from '../api/api';
 
 const usersApi = api.injectEndpoints({
   endpoints: (builder) => ({
     postUser: builder.mutation({
       query: (newUser) => ({
-        url: "/register",
-        method: "POST",
+        url: '/register',
+        method: 'POST',
         body: newUser,
       }),
-      providesTags: [{ type: "User" }],
+      providesTags: [{ type: 'User' }],
     }),
   }),
 });

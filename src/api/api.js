@@ -1,9 +1,8 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-// const API_URL = `https://stockitback.onrender.com`;
-const API_URL = `https://stockitback.onrender.com`;
+const API_URL = `http://localhost:3000/`;
 
-const api = createApi({
+export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
     baseUrl: API_URL,
@@ -18,4 +17,3 @@ const api = createApi({
   tagTypes: ['User'],
   endpoints: () => ({}),
 });
-export default api;
