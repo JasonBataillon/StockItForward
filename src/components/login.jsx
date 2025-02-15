@@ -11,7 +11,8 @@ const Login = () => {
     event.preventDefault(); // Prevent the default form submission behavior
     // Here you would typically handle the login logic, such as sending the data to your server
     try {
-      const response = await fetch('https://stockitback.onrender.com/login', {
+      // const response = await fetch('https://stockitback.onrender.com/login', {
+      const response = await fetch('http://localhost:3000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -25,7 +26,7 @@ const Login = () => {
         throw new Error('Login failed');
       }
 
-      const data = response.json();
+      const data = await response.json();
       console.log('Login successful:', data);
       setMessage('Login successful!');
     } catch (error) {
