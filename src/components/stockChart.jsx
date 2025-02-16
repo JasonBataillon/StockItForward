@@ -22,7 +22,6 @@ const StockCharts = () => {
   const [loading, setLoading] = useState(true); //declaring hook to indicate whether app is working instead of blank screening
   //   const API_KEY = import.process.env.REACT_APP_POLYGON_API_KEY; //Get the API key from environment variable
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
-  const [addStockToWatchlist] = useAddStockToWatchlistMutation();
 
   //Dummy data
   //Needs data in order to function, we will aim to collect this
@@ -52,12 +51,16 @@ const StockCharts = () => {
 
           `https://api.polygon.io/v2/aggs/ticker/${stocksTicker}/range/${multiplier}/${timespan}/${from}/${to}?adjusted=true&sort=asc&limit=30&apiKey=${API_KEY}`
         );
+        // const another = await fetch(
+        //   'https://api.polygon.io/v1/open-close/AAPL/2023-01-09?adjusted=true&apiKey=ZYGvBmAzn50GCoKTGNJRuIjcwtBPcjhR'
+        // );
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
 
         const json = await response.json(); //Take the data from Axios into the json
+        // const json2 = await another.json();
 
         if (json.results) {
           //Format the data for chart to read
@@ -68,7 +71,14 @@ const StockCharts = () => {
 
           setData(formattedData); //Set the data to the formatted data}
 
-          await saveStockToWatchlist(stocksTicker, 'Apple Inc.'); //Save the stock to the watchlist
+          const stockPrice = json.results[0].c; // Get the latest stock price
+          const marketCap = json.results[0].marketCap || 0;
+          await saveStockToWatchlist(
+            stocksTicker,
+            'Apple Inc.',
+            stockPrice,
+            marketCap
+          ); //Save the stock to the watchlist
         }
       } catch (error) {
         //Log Errors during fetching
@@ -78,25 +88,39 @@ const StockCharts = () => {
       }
     };
 
-    const saveStockToWatchlist = async (stockTicker, stockName) => {
+    const saveStockToWatchlist = async (
+      stockTicker,
+      stockName,
+      stockPrice,
+      marketCap
+    ) => {
       try {
         const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
-        // const response = await fetch('/watchlist/add', {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     Authorization: `Bearer ${token}`,
-        //   },
-        //   body: JSON.stringify({ stockTicker, stockName }),
-        // });
+        if (!token) {
+          throw new Error('No token found');
+        }
 
-        // if (!response.ok) {
-        //   throw new Error('Failed to save stock to watchlist');
-        // }
+        const response = await fetch('http://localhost:3000/watchlist/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            stockTicker,
+            stockName,
+            stockPrice,
+            marketCap,
+          }),
+        });
+        console.log(response);
 
-        // const result = await response.json();
-        await addStockToWatchlist({ stockTicker, stockName, token }).unwrap();
-        console.log('Stock saved to watchlist:');
+        if (!response.ok) {
+          throw new Error('Failed to save stock to watchlist');
+        }
+
+        const result = await response.json();
+        console.log('Stock saved to watchlist:', result);
       } catch (error) {
         console.error('Error saving stock to watchlist:', error);
       }
