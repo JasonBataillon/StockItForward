@@ -23,7 +23,10 @@ const StockCharts = () => {
 
   const [data, setData] = useState([]); //declaring hook for data storage
   const [loading, setLoading] = useState(true); //declaring hook to indicate whether app is working instead of blank screening
-  //   const API_KEY = import.process.env.REACT_APP_POLYGON_API_KEY; //Get the API key from environment variable
+  const [stockPrice, setStockPrice] = useState(null);
+  const [marketCap, setMarketCap] = useState(null);
+  const [stockTicker, setStockTicker] = useState('AAPL');
+  const [stockName, setStockName] = useState('Apple Inc.');
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
 
   //Dummy data
@@ -46,6 +49,9 @@ const StockCharts = () => {
     const fetchStockData = async () => {
       try {
         //When moving to allow user to control these, we may need to have these values passed as props
+
+        // const stocksTicker = 'AAPL'; // Change this to get different stock
+
         const multiplier = 1; // Change this to get different time scale
         const timespan = "day"; // day, week, month, quarter, year
         const from = "2023-01-01"; // starting YEAR-MO-DA
@@ -53,7 +59,7 @@ const StockCharts = () => {
         const response = await fetch(
           //url can be controlled by what stock by the content between
 
-          `https://api.polygon.io/v2/aggs/ticker/${stocksTicker}/range/${multiplier}/${timespan}/${from}/${to}?adjusted=true&sort=asc&limit=30&apiKey=${API_KEY}`
+          `https://api.polygon.io/v2/aggs/ticker/${stockTicker}/range/${multiplier}/${timespan}/${from}/${to}?adjusted=true&sort=asc&limit=30&apiKey=${API_KEY}`
         );
         // const another = await fetch(
         //   'https://api.polygon.io/v1/open-close/AAPL/2023-01-09?adjusted=true&apiKey=ZYGvBmAzn50GCoKTGNJRuIjcwtBPcjhR'
@@ -73,16 +79,18 @@ const StockCharts = () => {
             close: item.c, // Closing price
           }));
 
-          setData(formattedData); //Set the data to the formatted data}
+          setData(formattedData);
+          setStockPrice(json.results[0].c);
+          setMarketCap(json.results[0].marketCap || 0); //Set the data to the formatted data}
 
-          const stockPrice = json.results[0].c; // Get the latest stock price
-          const marketCap = json.results[0].marketCap || 0;
-          await saveStockToWatchlist(
-            stocksTicker,
-            "Apple Inc.",
-            stockPrice,
-            marketCap
-          ); //Save the stock to the watchlist
+          // const stockPrice = json.results[0].c; // Get the latest stock price
+          // const marketCap = json.results[0].marketCap || 0;
+          // await saveStockToWatchlist(
+          //   stocksTicker,
+          //   'Apple Inc.',
+          //   stockPrice,
+          //   marketCap
+          // ); //Save the stock to the watchlist
         }
       } catch (error) {
         //Log Errors during fetching
@@ -92,54 +100,41 @@ const StockCharts = () => {
       }
     };
 
-    const saveStockToWatchlist = async (
-      stockTicker,
-      stockName,
-      stockPrice,
-      marketCap
-    ) => {
-      try {
-        const token = localStorage.getItem("token"); // Assuming the token is stored in localStorage
-        if (!token) {
-          throw new Error("No token found");
-        }
-
-        const response = await fetch("http://localhost:3000/watchlist/add", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            stockTicker,
-            stockName,
-            stockPrice,
-            marketCap,
-          }),
-        });
-        console.log(response);
-
-        if (!response.ok) {
-          throw new Error("Failed to save stock to watchlist");
-        }
-
-        const result = await response.json();
-
-        if (result.results) {
-          const formattedData = result.results.map((item) => ({
-            date: new Date(item.t).toLocaleDateString(),
-            close: item.c,
-          }));
-          setData(formattedData);
-        }
-
-        console.log("Stock saved to watchlist:", result);
-      } catch (error) {
-        console.error("Error saving stock to watchlist:", error);
-      }
-    };
     fetchStockData(); //run that useEffect function above
-  }, [stocksTicker]);
+  }, [API_KEY]);
+
+  const saveStockToWatchlist = async () => {
+    try {
+      const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
+      if (!token) {
+        throw new Error('No token found');
+      }
+
+      const response = await fetch('http://localhost:3000/watchlist/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          stockTicker,
+          stockName,
+          stockPrice,
+          marketCap,
+        }),
+      });
+      console.log(response);
+
+      if (!response.ok) {
+        throw new Error('Failed to save stock to watchlist');
+      }
+
+      const result = await response.json();
+      console.log('Stock saved to watchlist:', result);
+    } catch (error) {
+      console.error('Error saving stock to watchlist:', error);
+    }
+  };
 
   //Does the loading message thing while fetching
   if (loading) {
@@ -169,6 +164,7 @@ const StockCharts = () => {
         {/* Adds space to top of graph*/}
         <Tooltip />
       </LineChart>
+      <button onClick={saveStockToWatchlist}>Save to Watchlist</button>
     </div>
   );
 };

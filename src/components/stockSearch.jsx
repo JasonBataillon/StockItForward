@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+
 const StockSearch = () => {
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY; //Get API key from /.env
   if (!API_KEY) {
     throw new Error("API key is missing");
   }
 
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false); //boilerplate loading state
   const [error, setError] = useState(null); //boilerplate error handling
@@ -21,7 +22,11 @@ const StockSearch = () => {
     setError(null);
     setResults([]);
     setLoading(true); //Will just inform program is processing
-    await new Promise((resolve) => setTimeout(resolve, 3000)); //force delay of 3 seconds
+
+    setTimeout(() => {
+      setRanOnce(true);
+    }, 3000); //force delay of 3 seconds
+
     setRanOnce(true);
 
     try {
@@ -29,7 +34,7 @@ const StockSearch = () => {
         `https://api.polygon.io/v3/reference/tickers?search=${query}&apiKey=${API_KEY}`
       );
       if (!response.ok) {
-        throw new Error("Failed to fetch data");
+        throw new Error('Failed to fetch data');
       }
       const result = await response.json();
       setResults(result.results || []);
