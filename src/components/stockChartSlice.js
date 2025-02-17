@@ -13,5 +13,5 @@ const watchlistApi = api.injectEndpoints({
   }),
 });
 
-export default watchlistApi;
 export const { useAddStockToWatchlistMutation } = watchlistApi;
+export default watchlistApi;
