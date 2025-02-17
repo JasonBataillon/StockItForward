@@ -1,6 +1,8 @@
 //Functionality: Search stocks on Polygon.io by search API call
 
-import { useState } from 'react';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 const StockSearch = () => {
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY; //Get API key from /.env
@@ -13,6 +15,7 @@ const StockSearch = () => {
   const [loading, setLoading] = useState(false); //boilerplate loading state
   const [error, setError] = useState(null); //boilerplate error handling
   const [ranOnce, setRanOnce] = useState(false); //Brute force check
+  const navigate = useNavigate();
 
   const fetchStockData = async (e) => {
     e.preventDefault();
@@ -41,7 +44,11 @@ const StockSearch = () => {
       setLoading(false);
     }
   };
-
+  // Function to handle stock selection
+  // This function is what sends the prop to stockCharts.jsx
+  const handleStockSelect = (ticker) => {
+    navigate("/stockCharts", { state: { stockTicker: ticker } }); // Pass stock ticker as state
+  };
   return (
     <div>
       <h2>Stock Search</h2>
@@ -63,7 +70,10 @@ const StockSearch = () => {
             {results.map((stock) => (
               <li key={stock.ticker}>
                 <strong>
-                  {stock.name} <button>{stock.ticker}</button>
+                  {stock.name}
+                  <button onClick={() => handleStockSelect(stock.ticker)}>
+                    {stock.ticker}
+                  </button>
                 </strong>
               </li>
             ))}
