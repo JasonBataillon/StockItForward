@@ -126,7 +126,7 @@ const StockCharts = () => {
         const result = await response.json();
 
         if (result.results) {
-          const formattedData = json.results.map((item) => ({
+          const formattedData = result.results.map((item) => ({
             date: new Date(item.t).toLocaleDateString(),
             close: item.c,
           }));
@@ -165,7 +165,7 @@ const StockCharts = () => {
         <Line type="monotone" dataKey="close" stroke="#8884d8" />
         <CartesianGrid stroke="#ccc" strokeWidth={1} />
         <XAxis dataKey="date" />
-        <YAxis domain={["auto", "dataMax + 5", "dataMin - 5"]} />{" "}
+        <YAxis domain={["auto", "dataMax + 5"]} />
         {/* Adds space to top of graph*/}
         <Tooltip />
       </LineChart>
