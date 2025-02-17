@@ -37,8 +37,7 @@ const Register = () => {
       };
       const response = await postUser(body).unwrap();
       console.log(response);
-      console.log(response.error);
-      // console.log(response.error.data);
+      // console.log(response.error);
       // if (response.error) {
       //   throw new Error(response.error.data.message || "Registration failed");
       // }
