@@ -4,6 +4,9 @@ import { useState } from "react";
 
 const StockSearch = () => {
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY; //Get API key from /.env
+  if (!API_KEY) {
+    throw new Error("API key is missing");
+  }
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -16,7 +19,7 @@ const StockSearch = () => {
     setError(null);
     setResults([]);
     setLoading(true); //Will just inform program is processing
-    setTimeout(), 3000; //force delay of 3 seconds
+    await new Promise((resolve) => setTimeout(resolve, 3000)); //force delay of 3 seconds
     setRanOnce(true);
 
     try {
