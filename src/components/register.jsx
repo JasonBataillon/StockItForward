@@ -1,17 +1,20 @@
-import { useState } from 'react';
-import { usePostUserMutation } from './usersSlice';
+import { useState } from "react";
+import { usePostUserMutation } from "./usersSlice";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [postUser] = usePostUserMutation();
+  const navigate = useNavigate();
+
   // This state holds the form data: email and password
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   //This state holds the message to be displayed to the user
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   // This function updates the formData state whenever the user types in the input fields
   const handleChange = (e) => {
     setFormData({
@@ -23,10 +26,10 @@ const Register = () => {
   // This function runs when the form is submitted
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevents the page from refreshing when the form is submitted
-    console.log('Registering user:', formData); // For now, just log the data to the console
+    console.log("Registering user:", formData); // For now, just log the data to the console
     // Later, this is where you'd send the data to your backend API
     if (formData.password !== formData.confirmPassword) {
-      setMessage('Passwords do not match!');
+      setMessage("Passwords do not match!");
       return;
     }
     try {
@@ -41,18 +44,22 @@ const Register = () => {
       // if (response.error) {
       //   throw new Error(response.error.data.message || "Registration failed");
       // }
+      localStorage.setItem("token", response.token); // save token to local storage
 
-      console.log('User registered:', response.data);
-      setMessage('Registration successful!');
-      localStorage.setItem('token', response.token);
+      console.log("User registered:", response);
+      setMessage("Registration successful! redirecting");
+      setTimeout(() => {
+        navigate("/");
+      }, 2000); // Redirect to login after 2 seconds
+      
     } catch (error) {
-      console.error('Error:', error);
-      setMessage('Registration failed.');
+      console.error("Error:", error);
+      setMessage("Registration failed.");
     }
   };
 
   return (
-    <div style={{ maxWidth: '300px', margin: 'auto' }}>
+    <div style={{ maxWidth: "300px", margin: "auto" }}>
       <h2>Register</h2>
       <form onSubmit={handleSubmit}>
         <div>
