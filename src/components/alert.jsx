@@ -24,21 +24,39 @@
 //         </div>
 //     );
 // };
-
 import React, { useState, useEffect } from "react";
-import StockAlert from "./Untitled-1";
-import fetch from "node-fetch";
+import StockCharts from "./stockChart";
 
-const StockAlert = ({ stockSymbol }) => {
+const StockAlert = () => {
   const [price, setPrice] = useState(null);
   const [initialPrice, setInitialPrice] = useState(null);
   const [alert, setAlert] = useState(false);
+  const [stockTicker, setStockTicker] = useState("AAPL");
 
+  // console.log(price);
+  // console.log(initialPrice);
+  console.log(alert);
+  console.log(stockTicker);
+
+  const handlePriceChange = (price) => {
+    setPrice(price);
+    if (initialPrice === null) {
+      setInitialPrice(price);
+    } else {
+      const priceChange = ((price - initialPrice) / initialPrice) * 100;
+      if (Math.abs(priceChange) >= 5) {
+        setAlert(true);
+      }
+    }
+  };
+  // const stocksTicker = location.state?.stockTicker || "AAPL";
+  const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
+  const query = "AAPL";
   useEffect(() => {
     const fetchStockPrice = async () => {
       // Replace with actual API call to fetch stock price
       const response = await fetch(
-        `https://api.example.com/stocks/${stockSymbol}`
+        `https://api.polygon.io/v3/reference/tickers?search=${query}&apiKey=${API_KEY}`
       );
       const data = await response.json();
       return data.price;
@@ -56,23 +74,25 @@ const StockAlert = ({ stockSymbol }) => {
         }
       }
       setPrice(currentPrice);
+      console.log(price);
     };
 
     const intervalId = setInterval(checkPriceChange, 60000); // Check every minute
 
     return () => clearInterval(intervalId);
-  }, [initialPrice, stockSymbol]);
+  }, [initialPrice, stockTicker]);
 
   return (
     <div>
-      <h1>Stock Price Alert</h1>
-      <p>Stock: {stockSymbol}</p>
+      <h1>Stock Price Alerts</h1>
+      <p>Stock: {stockTicker}</p>
       <p>Current Price: {price}</p>
       {alert && (
         <p style={{ color: "red" }}>
           Alert: Stock price changed by 5% or more!
         </p>
       )}
+      <StockCharts onStockPriceChange={handlePriceChange} />
     </div>
   );
 };

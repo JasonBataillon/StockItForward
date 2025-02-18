@@ -18,15 +18,15 @@ import {
 } from "recharts";
 import { useAddStockToWatchlistMutation } from "./stockChartSlice";
 
-const StockCharts = () => {
+const StockCharts = ({ onStockPriceChange }) => {
   const location = useLocation();
 
   const [data, setData] = useState([]); //declaring hook for data storage
   const [loading, setLoading] = useState(true); //declaring hook to indicate whether app is working instead of blank screening
   const [stockPrice, setStockPrice] = useState(null);
   const [marketCap, setMarketCap] = useState(null);
-  const [stockTicker, setStockTicker] = useState('AAPL');
-  const [stockName, setStockName] = useState('Apple Inc.');
+  const [stockTicker, setStockTicker] = useState("AAPL");
+  const [stockName, setStockName] = useState("Apple Inc.");
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
 
   //Dummy data
@@ -83,6 +83,9 @@ const StockCharts = () => {
           setStockPrice(json.results[0].c);
           setMarketCap(json.results[0].marketCap || 0); //Set the data to the formatted data}
 
+          if (onStockPriceChange) {
+            onStockPriceChange(json.results[0].c);
+          }
           // const stockPrice = json.results[0].c; // Get the latest stock price
           // const marketCap = json.results[0].marketCap || 0;
           // await saveStockToWatchlist(
@@ -101,19 +104,19 @@ const StockCharts = () => {
     };
 
     fetchStockData(); //run that useEffect function above
-  }, [API_KEY]);
+  }, [API_KEY, stockTicker, onStockPriceChange]);
 
   const saveStockToWatchlist = async () => {
     try {
-      const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
+      const token = localStorage.getItem("token"); // Assuming the token is stored in localStorage
       if (!token) {
-        throw new Error('No token found');
+        throw new Error("No token found");
       }
 
-      const response = await fetch('http://localhost:3000/watchlist/add', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3000/watchlist/add", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -126,13 +129,13 @@ const StockCharts = () => {
       console.log(response);
 
       if (!response.ok) {
-        throw new Error('Failed to save stock to watchlist');
+        throw new Error("Failed to save stock to watchlist");
       }
 
       const result = await response.json();
-      console.log('Stock saved to watchlist:', result);
+      console.log("Stock saved to watchlist:", result);
     } catch (error) {
-      console.error('Error saving stock to watchlist:', error);
+      console.error("Error saving stock to watchlist:", error);
     }
   };
 
