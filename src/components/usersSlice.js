@@ -10,9 +10,16 @@ const usersApi = api.injectEndpoints({
       }),
       providesTags: [{ type: 'User' }],
     }),
+    getUserWatchlist: builder.query({
+      query: () => ({
+        url: '/user/watchlist',
+        method: 'GET',
+      }),
+      providesTags: [{ type: 'User' }],
+    }),
   }),
 });
 
 export default usersApi;
 
-export const { usePostUserMutation } = usersApi;
+export const { usePostUserMutation, useGetUserWatchlistQuery } = usersApi;
