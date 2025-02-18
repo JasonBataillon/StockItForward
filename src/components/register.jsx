@@ -44,6 +44,7 @@ const Register = () => {
 
       console.log('User registered:', response.data);
       setMessage('Registration successful!');
+      localStorage.setItem('token', response.token);
     } catch (error) {
       console.error('Error:', error);
       setMessage('Registration failed.');

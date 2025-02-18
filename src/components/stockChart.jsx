@@ -4,8 +4,8 @@
 //If we keep this method of doing this, we may want to
 //allow more options for the user to select to view data.
 
-import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 //https://recharts.org/en-US/
 //See guide there
 import {
@@ -15,8 +15,8 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-} from "recharts";
-import { useAddStockToWatchlistMutation } from "./stockChartSlice";
+} from 'recharts';
+import { useAddStockToWatchlistMutation } from './stockChartSlice';
 
 const StockCharts = () => {
   const location = useLocation();
@@ -43,7 +43,7 @@ const StockCharts = () => {
   //     { name: "Page G", uv: 349, pv: 4300, amt: 2100 },
   //   ];
 
-  const stocksTicker = location.state?.stockTicker || "AAPL"; // Change this to get different stock
+  const stocksTicker = location.state?.stockTicker || 'AAPL'; // Change this to get different stock
 
   useEffect(() => {
     const fetchStockData = async () => {
@@ -53,9 +53,9 @@ const StockCharts = () => {
         // const stocksTicker = 'AAPL'; // Change this to get different stock
 
         const multiplier = 1; // Change this to get different time scale
-        const timespan = "day"; // day, week, month, quarter, year
-        const from = "2023-01-01"; // starting YEAR-MO-DA
-        const to = "2023-12-31"; // ending YEAR-MO-DA
+        const timespan = 'day'; // day, week, month, quarter, year
+        const from = '2023-01-01'; // starting YEAR-MO-DA
+        const to = '2023-12-31'; // ending YEAR-MO-DA
         const response = await fetch(
           //url can be controlled by what stock by the content between
 
@@ -66,7 +66,7 @@ const StockCharts = () => {
         // );
 
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error('Network response was not ok');
         }
 
         const json = await response.json(); //Take the data from Axios into the json
@@ -94,7 +94,7 @@ const StockCharts = () => {
         }
       } catch (error) {
         //Log Errors during fetching
-        console.error("Error fetching stock data:", error);
+        console.error('Error fetching stock data:', error);
       } finally {
         setLoading(false); //Set loading to false when done. This is neat/
       }
@@ -123,15 +123,15 @@ const StockCharts = () => {
           marketCap,
         }),
       });
-      console.log(response);
+
+      const result = await response.json();
+      console.log('Stock saved to watchlist:', result);
 
       if (!response.ok) {
         throw new Error('Failed to save stock to watchlist');
       }
-
-      const result = await response.json();
-      console.log('Stock saved to watchlist:', result);
     } catch (error) {
+      alert('This stock is already in your watchlist!');
       console.error('Error saving stock to watchlist:', error);
     }
   };
@@ -160,7 +160,7 @@ const StockCharts = () => {
         <Line type="monotone" dataKey="close" stroke="#8884d8" />
         <CartesianGrid stroke="#ccc" strokeWidth={1} />
         <XAxis dataKey="date" />
-        <YAxis domain={["auto", "dataMax + 5"]} />
+        <YAxis domain={['auto', 'dataMax + 5']} />
         {/* Adds space to top of graph*/}
         <Tooltip />
       </LineChart>

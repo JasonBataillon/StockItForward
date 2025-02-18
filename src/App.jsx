@@ -3,14 +3,14 @@
 //import viteLogo from '/vite.svg'
 
 //for aaron and jason
-import "./App.css";
-import Register from "./components/register";
-import Login from "./components/login";
-import Navbar from "./components/navbar";
-import StockCharts from "./components/stockChart";
-import StockSearch from "./components/stockSearch";
-import Alert from "./components/alert";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import './App.css';
+import Register from './components/register';
+import Login from './components/login';
+import Navbar from './components/navbar';
+import StockCharts from './components/stockChart';
+import StockSearch from './components/stockSearch';
+// import Alert from './components/alert';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 function App() {
   return (
     <div>
@@ -18,7 +18,7 @@ function App() {
         <Navbar />
 
         <Routes>
-          <Route path="/" element={<Alert />} />
+          {/* <Route path="/" element={<Alert />} /> */}
           <Route path="/stockSearch" element={<StockSearch />} />
           <Route path="/stockCharts" element={<StockCharts />} />
           <Route path="/login" element={<Login />} />
