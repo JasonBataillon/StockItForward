@@ -24,14 +24,14 @@
 //         </div>
 //     );
 // };
-import React, { useState, useEffect } from "react";
-import StockCharts from "./stockChart";
+import React, { useState, useEffect } from 'react';
+import StockCharts from './stockChart';
 
 const StockAlert = () => {
   const [price, setPrice] = useState(null);
   const [initialPrice, setInitialPrice] = useState(null);
   const [alert, setAlert] = useState(false);
-  const [stockTicker, setStockTicker] = useState("AAPL");
+  const [stockTicker, setStockTicker] = useState('AAPL');
 
   // console.log(price);
   // console.log(initialPrice);
@@ -51,7 +51,7 @@ const StockAlert = () => {
   };
   // const stocksTicker = location.state?.stockTicker || "AAPL";
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
-  const query = "AAPL";
+  const query = 'AAPL';
   useEffect(() => {
     const fetchStockPrice = async () => {
       // Replace with actual API call to fetch stock price
@@ -88,7 +88,7 @@ const StockAlert = () => {
       <p>Stock: {stockTicker}</p>
       <p>Current Price: {price}</p>
       {alert && (
-        <p style={{ color: "red" }}>
+        <p style={{ color: 'red' }}>
           Alert: Stock price changed by 5% or more!
         </p>
       )}

@@ -25,8 +25,8 @@ const StockCharts = ({ onStockPriceChange }) => {
   const [loading, setLoading] = useState(true); //declaring hook to indicate whether app is working instead of blank screening
   const [stockPrice, setStockPrice] = useState(null);
   const [marketCap, setMarketCap] = useState(null);
-  const [stockTicker, setStockTicker] = useState("AAPL");
-  const [stockName, setStockName] = useState("Apple Inc.");
+  const [stockTicker, setStockTicker] = useState('AAPL');
+  const [stockName, setStockName] = useState('Apple Inc.');
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
 
   //Dummy data
@@ -108,15 +108,15 @@ const StockCharts = ({ onStockPriceChange }) => {
 
   const saveStockToWatchlist = async () => {
     try {
-      const token = localStorage.getItem("token"); // Assuming the token is stored in localStorage
+      const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
       if (!token) {
-        throw new Error("No token found");
+        throw new Error('No token found');
       }
 
-      const response = await fetch("http://localhost:3000/watchlist/add", {
-        method: "POST",
+      const response = await fetch('http://localhost:3000/watchlist/add', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -131,7 +131,7 @@ const StockCharts = ({ onStockPriceChange }) => {
       console.log('Stock saved to watchlist:', result);
 
       if (!response.ok) {
-        throw new Error("Failed to save stock to watchlist");
+        throw new Error('Failed to save stock to watchlist');
       }
     } catch (error) {
       alert('This stock is already in your watchlist!');
