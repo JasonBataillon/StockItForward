@@ -44,10 +44,6 @@ const Users = () => {
       fetchStockPrices();
     }
 
-    const interval = setInterval(() => {
-      refetch();
-    }, 60000);
-
     return () => clearInterval(interval);
   }, [watchlist, refetch]);
 
