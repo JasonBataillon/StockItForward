@@ -34,6 +34,10 @@ const StockAlert = () => {
 
     // Initial check
     checkPriceChange();
+    const intervalId = setInterval(checkPriceChange, 300000); // Check every 5 minutes
+
+    // Initial check
+    checkPriceChange();
 
     return () => clearInterval(intervalId);
   }, [initialPrice, stockTicker]);
@@ -53,6 +57,7 @@ const StockAlert = () => {
           Alert: Stock price changed by 5% or more!
         </p>
       )}
+      {/* <StockCharts onStockPriceChange={handlePriceChange} /> */}
       {/* <StockCharts onStockPriceChange={handlePriceChange} /> */}
     </div>
   );

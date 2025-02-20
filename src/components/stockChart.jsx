@@ -9,7 +9,7 @@ import {
   Tooltip,
 } from 'recharts';
 
-const StockCharts = ({ onStockPriceChange }) => {
+const StockChart = ({ onStockPriceChange }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const {
@@ -44,9 +44,14 @@ const StockCharts = ({ onStockPriceChange }) => {
         );
 
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          if (response.status === 401) {
+            throw new Error('Unauthorized: Check your API key');
+          } else {
+            throw new Error('Network response was not ok');
+          }
         }
 
+        const json = await response.json();
         const json = await response.json();
 
         if (json.results) {
@@ -66,6 +71,7 @@ const StockCharts = ({ onStockPriceChange }) => {
       } catch (error) {
         console.error('Error fetching stock data:', error);
       } finally {
+        setLoading(false);
         setLoading(false);
       }
     };
@@ -124,7 +130,7 @@ const StockCharts = ({ onStockPriceChange }) => {
         margin={{ top: 20, right: 20, bottom: 5, left: 0 }}
       >
         <Line type="monotone" dataKey="close" stroke="#8884d8" />
-        <CartesianGrid stroke="#ccc" strokeWidth={1} />
+        <CartesianGrid stroke="#ccc" />
         <XAxis dataKey="date" />
         <YAxis domain={['auto', 'dataMax + 5']} />
         <Tooltip />
@@ -134,4 +140,4 @@ const StockCharts = ({ onStockPriceChange }) => {
   );
 };
 
-export default StockCharts;
+export default StockChart;
