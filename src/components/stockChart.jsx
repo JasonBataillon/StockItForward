@@ -276,7 +276,9 @@ const StockChart = ({ onStockPriceChange }) => {
       const result = await response.json();
       console.log("Stock saved to watchlist:", result);
 
-      if (!response.ok) {
+      if (response.ok) {
+        alert("This stock has been added into your watchlist!", result);
+      } else {
         throw new Error("Failed to save stock to watchlist");
       }
     } catch (error) {
