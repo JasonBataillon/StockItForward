@@ -52,7 +52,6 @@ const StockChart = ({ onStockPriceChange }) => {
         }
 
         const json = await response.json();
-        const json = await response.json();
 
         if (json.results) {
           const formattedData = json.results.map((item) => ({
@@ -105,7 +104,9 @@ const StockChart = ({ onStockPriceChange }) => {
       const result = await response.json();
       console.log('Stock saved to watchlist:', result);
 
-      if (!response.ok) {
+      if (response.ok) {
+        alert('This stock has been added into your watchlist!', result);
+      } else {
         throw new Error('Failed to save stock to watchlist');
       }
     } catch (error) {
@@ -123,6 +124,10 @@ const StockChart = ({ onStockPriceChange }) => {
       <h1>Stock Charts</h1>
       <div>{stockTicker}</div>
       <div>{stockName}</div>
+      <p>
+        Current Price:{' '}
+        {stockPrice !== null ? `$${stockPrice.toFixed(2)}` : 'Loading...'}
+      </p>
       <LineChart
         width={800}
         height={800}
