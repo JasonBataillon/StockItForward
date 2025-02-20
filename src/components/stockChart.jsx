@@ -1,15 +1,5 @@
-//Note: A lot of this is subject to change in the future.
-//Such as, we may decide to make the call from our own
-//database that has the stored data instead.
-//If we keep this method of doing this, we may want to
-//allow more options for the user to select to view data.
-
-// export default StockCharts;
-import { useEffect, useState } from "react";
-import { useAddStockToWatchlistMutation } from "./stockChartSlice";
-import { useLocation, useNavigate } from "react-router-dom";
-//https://recharts.org/en-US/
-//See guide there
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LineChart,
   Line,
@@ -17,66 +7,71 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-} from "recharts";
+} from 'recharts';
 
 const StockChart = ({ onStockPriceChange }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const stockTicker = location.state?.stockTicker; // Get stock ticker from location state or default to "AAPL"
+  const {
+    stockTicker,
+    stockPrice: initialStockPrice,
+    stockName: initialStockName,
+  } = location.state || {};
 
   useEffect(() => {
     if (!stockTicker) {
-      navigate("/stockSearch");
+      console.error('No stockTicker found in location state');
+      navigate('/stockSearch'); // Redirect to stock search if no stockTicker is found
     }
   }, [stockTicker, navigate]);
 
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [stockPrice, setStockPrice] = useState(null);
+  const [data, setData] = useState([]); //declaring hook for data storage
+  const [loading, setLoading] = useState(true); //declaring hook to indicate whether app is working instead of blank screening
+  const [stockPrice, setStockPrice] = useState(initialStockPrice);
   const [marketCap, setMarketCap] = useState(null);
-  const [stockName, setStockName] = useState(null);
-  // const [stockTicker, setStockTicker] = useState(null);
+  const [stockName, setStockName] = useState(initialStockName);
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
 
   useEffect(() => {
     const fetchStockData = async () => {
       try {
         const multiplier = 1; // Change this to get different time scale
-        const timespan = "day"; // day, week, month, quarter, year
-        const from = "2023-01-01"; // starting YEAR-MO-DA
-        const to = "2023-12-31"; // ending YEAR-MO-DA
+        const timespan = 'day'; // day, week, month, quarter, year
+        const from = '2023-01-01'; // starting YEAR-MO-DA
+        const to = '2023-12-31'; // ending YEAR-MO-DA
         const response = await fetch(
           `https://api.polygon.io/v2/aggs/ticker/${stockTicker}/range/${multiplier}/${timespan}/${from}/${to}?adjusted=true&sort=asc&limit=30&apiKey=${API_KEY}`
         );
 
         if (!response.ok) {
           if (response.status === 401) {
-            throw new Error("Unauthorized: Check your API key");
+            throw new Error('Unauthorized: Check your API key');
           } else {
-            throw new Error("Network response was not ok");
+            throw new Error('Network response was not ok');
           }
         }
 
         const json = await response.json();
+        const json = await response.json();
 
         if (json.results) {
           const formattedData = json.results.map((item) => ({
-            date: new Date(item.t).toLocaleDateString(), // Convert timestamp to date string
-            close: item.c, // Closing price
+            date: new Date(item.t).toLocaleDateString(),
+            close: item.c,
           }));
 
           setData(formattedData);
           setStockPrice(json.results[0].c);
           setMarketCap(json.results[0].marketCap || 0);
-          setStockName(json.ticker);
 
           if (onStockPriceChange) {
             onStockPriceChange(json.results[0].c);
           }
         }
       } catch (error) {
-        console.error("Error fetching stock data:", error);
+        console.error('Error fetching stock data:', error);
       } finally {
+        setLoading(false);
         setLoading(false);
       }
     };
@@ -84,19 +79,19 @@ const StockChart = ({ onStockPriceChange }) => {
     if (stockTicker) {
       fetchStockData();
     }
-  }, [stockTicker, onStockPriceChange, API_KEY]);
+  }, [API_KEY, stockTicker, onStockPriceChange]);
 
   const saveStockToWatchlist = async () => {
     try {
-      const token = localStorage.getItem("token"); // Assuming the token is stored in localStorage
+      const token = localStorage.getItem('token');
       if (!token) {
-        throw new Error("No token found");
+        throw new Error('No token found');
       }
 
-      const response = await fetch("http://localhost:3000/watchlist/add", {
-        method: "POST",
+      const response = await fetch('http://localhost:3000/watchlist/add', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -108,40 +103,36 @@ const StockChart = ({ onStockPriceChange }) => {
       });
 
       const result = await response.json();
-      console.log("Stock saved to watchlist:", result);
+      console.log('Stock saved to watchlist:', result);
 
-      if (response.ok) {
-        alert("This stock has been added into your watchlist!", result);
-      } else {
-        throw new Error("Failed to save stock to watchlist");
+      if (!response.ok) {
+        throw new Error('Failed to save stock to watchlist');
       }
     } catch (error) {
-      alert("This stock is already in your watchlist!");
-      console.error("Error saving stock to watchlist:", error);
+      alert('This stock is already in your watchlist!');
+      console.error('Error saving stock to watchlist:', error);
     }
   };
 
-  //Does the loading message thing while fetching
   if (loading) {
     return <div>Loading...</div>;
   }
+
   return (
     <div>
-      <h2>Stock Chart for {stockTicker}</h2>
-      <p>
-        Current Price:{" "}
-        {stockPrice !== null ? `$${stockPrice.toFixed(2)}` : "Loading..."}
-      </p>
-      {/* <p>
-        Market Cap:{" "}
-        {marketCap !== null ? `$${marketCap.toFixed(2)}` : "Loading..."}
-      </p> */}
-      {/* Render your chart here using the data */}
-      <LineChart width={600} height={300} data={data}>
+      <h1>Stock Charts</h1>
+      <div>{stockTicker}</div>
+      <div>{stockName}</div>
+      <LineChart
+        width={800}
+        height={800}
+        data={data}
+        margin={{ top: 20, right: 20, bottom: 5, left: 0 }}
+      >
         <Line type="monotone" dataKey="close" stroke="#8884d8" />
         <CartesianGrid stroke="#ccc" />
         <XAxis dataKey="date" />
-        <YAxis />
+        <YAxis domain={['auto', 'dataMax + 5']} />
         <Tooltip />
       </LineChart>
       <button onClick={saveStockToWatchlist}>Save to Watchlist</button>

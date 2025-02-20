@@ -1,31 +1,29 @@
-//Functionality: Search stocks on Polygon.io by search API call
-
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { fetchStockPrice } from '../api/stockUtils';
 
 const StockSearch = () => {
-  const API_KEY = import.meta.env.VITE_POLYGON_API_KEY; //Get API key from /.env
+  const API_KEY = import.meta.env.VITE_POLYGON_API_KEY; // Get API key from /.env
   if (!API_KEY) {
-    throw new Error("API key is missing");
+    throw new Error('API key is missing');
   }
 
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false); //boilerplate loading state
-  const [error, setError] = useState(null); //boilerplate error handling
-  const [ranOnce, setRanOnce] = useState(false); //Brute force check
+  const [loading, setLoading] = useState(false); // Boilerplate loading state
+  const [error, setError] = useState(null); // Boilerplate error handling
+  const [ranOnce, setRanOnce] = useState(false); // Brute force check
   const navigate = useNavigate();
 
   const fetchStockData = async (e) => {
     e.preventDefault();
     setError(null);
     setResults([]);
-    setLoading(true); //Will just inform program is processing
+    setLoading(true); // Will just inform program is processing
 
     setTimeout(() => {
       setRanOnce(true);
-    }, 3000); //force delay of 3 seconds
+    }, 3000); // Force delay of 3 seconds
 
     setRanOnce(true);
 
@@ -44,11 +42,25 @@ const StockSearch = () => {
       setLoading(false);
     }
   };
+
   // Function to handle stock selection
   // This function is what sends the prop to stockCharts.jsx
-  const handleStockSelect = (ticker) => {
-    navigate("/stockCharts", { state: { stockTicker: ticker } }); // Pass stock ticker as state
+  const handleStockSelect = async (ticker) => {
+    try {
+      const { stockPrice, stockName } = await fetchStockPrice(ticker, API_KEY);
+      if (stockPrice !== null) {
+        console.log(`Fetched price for ${ticker}: $${stockPrice}`);
+        navigate('/stockCharts', {
+          state: { stockTicker: ticker, stockPrice, stockName },
+        }); // Pass stock ticker, price, and name as state
+      } else {
+        console.error(`Failed to fetch price for ${ticker}`);
+      }
+    } catch (error) {
+      console.error(`Error fetching price for ${ticker}:`, error);
+    }
   };
+
   return (
     <div>
       <h2>Stock Search</h2>
@@ -86,18 +98,3 @@ const StockSearch = () => {
 };
 
 export default StockSearch;
-
-//ignore below
-//archaic code i dont want to toss yet.
-//       const response = await axios.get(
-//         "https://api.polygon.io/v3/reference/tickers",
-//         {
-//           params: {
-//             apiKey: API_KEY,
-//             market: "stocks", // stocks, crypto, forex
-//             active: true, //true for only the active stocks
-//             limit: 25, // How many stocks that will be got
-//             search: query,
-//           },
-//         }
-//       );
