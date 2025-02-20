@@ -19,7 +19,7 @@ const StockAlert = () => {
   };
 
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
-  const query = "AAPL";
+  const query = "IBM";
 
   useEffect(() => {
     const fetchStockPrice = async () => {
@@ -32,6 +32,7 @@ const StockAlert = () => {
         }
         const data = await response.json();
         if (data.results && data.results.length > 0) {
+          setStockTicker(data.results[0].T);
           return data.results[0].c; // 'c' is the close price
         } else {
           console.error("No results found in API response");
