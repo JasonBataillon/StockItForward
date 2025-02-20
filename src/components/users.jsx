@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useGetUserWatchlistQuery } from './usersSlice';
+import { fetchStockPrice } from '../api/stockUtils';
 
 const Users = () => {
   const { data, error, isLoading, refetch } = useGetUserWatchlistQuery();
@@ -16,7 +17,6 @@ const Users = () => {
 
   useEffect(() => {
     const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
-    const query = 'AAPL';
     if (!API_KEY) {
       console.error('Polygon API key is not defined');
       return;
@@ -26,16 +26,13 @@ const Users = () => {
       const updatedPrices = {};
       for (const item of watchlist) {
         try {
-          const response = await fetch(
-            `https://api.polygon.io/v3/reference/tickers?search=AAPL}&apiKey=${API_KEY}`
+          const { stockPrice } = await fetchStockPrice(
+            item.stock.symbol,
+            API_KEY
           );
-          if (!response.ok) {
-            throw new Error(
-              `Error fetching data for ${item.stock.symbol}: ${response.statusText}`
-            );
+          if (stockPrice !== null) {
+            updatedPrices[item.stock.symbol] = stockPrice;
           }
-          const json = await response.json();
-          updatedPrices[item.stock.symbol] = json.last.price;
         } catch (error) {
           console.error(error);
         }
