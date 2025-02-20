@@ -5,7 +5,7 @@ const StockAlert = () => {
   const [price, setPrice] = useState(null);
   const [initialPrice, setInitialPrice] = useState(null);
   const [alert, setAlert] = useState(false);
-  const [stockTicker, setStockTicker] = useState('AAPL');
+  const [stockTicker, setStockTicker] = useState('AAPL'); // Set a default stock ticker
 
   const handlePriceChange = (price) => {
     setPrice(price);
@@ -20,27 +20,21 @@ const StockAlert = () => {
   };
 
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
-  const query = 'AAPL';
 
   useEffect(() => {
     const checkPriceChange = async () => {
-      const currentPrice = await fetchStockPrice(query, API_KEY);
-      if (currentPrice !== null) {
-        handlePriceChange(currentPrice);
+      const { stockPrice } = await fetchStockPrice(stockTicker, API_KEY);
+      if (stockPrice !== null) {
+        handlePriceChange(stockPrice);
       }
     };
 
-    const intervalId = setInterval(checkPriceChange, 300000); // Check every 5 minutes
-
     // Initial check
     checkPriceChange();
     const intervalId = setInterval(checkPriceChange, 300000); // Check every 5 minutes
-
-    // Initial check
-    checkPriceChange();
 
     return () => clearInterval(intervalId);
-  }, [initialPrice, stockTicker]);
+  }, [initialPrice, stockTicker, API_KEY]);
 
   return (
     <div>
@@ -57,8 +51,6 @@ const StockAlert = () => {
           Alert: Stock price changed by 5% or more!
         </p>
       )}
-      {/* <StockCharts onStockPriceChange={handlePriceChange} /> */}
-      {/* <StockCharts onStockPriceChange={handlePriceChange} /> */}
     </div>
   );
 };
