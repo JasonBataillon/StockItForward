@@ -20,7 +20,7 @@ function App() {
         <Navbar />
 
         <Routes>
-          <Route path="/" element={<StockAlert />} />
+          {/* <Route path="/" element={<StockAlert />} /> */}
           <Route path="/stockSearch" element={<StockSearch />} />
           <Route
             path="/stockCharts"

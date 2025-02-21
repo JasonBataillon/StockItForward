@@ -25,24 +25,11 @@ const StockChart = ({ onStockPriceChange }) => {
     }
   }, [stockTicker, navigate]);
 
-  useEffect(() => {
-    if (stockTicker) {
-      fetchStockData();
-    }
-  }, [
-    stockTicker,
-    API_KEY,
-    queryTimespan,
-    queryFromDate,
-    queryToDate,
-    queryAdjusted,
-  ]);
-
   const [data, setData] = useState([]); //declaring hook for data storage
   const [loading, setLoading] = useState(true); //declaring hook to indicate whether app is working instead of blank screening
   const [stockPrice, setStockPrice] = useState(initialStockPrice);
   const [marketCap, setMarketCap] = useState(null);
-  const [stockName, setStockName] = useState(initialStockName); //at no point is setStockName used. I dont know why this is the case.
+  const [stockName] = useState(initialStockName); //at no point is setStockName used. I dont know why this is the case.
 
   const [watchlistMessage, setWatchlistMessage] = useState(null);
   const [queryTimespan, setQueryTimespan] = useState("day");
@@ -56,9 +43,9 @@ const StockChart = ({ onStockPriceChange }) => {
   const fetchStockData = async () => {
     try {
       const multiplier = 1; // Change this to get different time scale
-      const timespan = "day"; // day, week, month, quarter, year
-      const from = "2023-01-01"; // starting YEAR-MO-DA
-      const to = "2023-12-31"; // ending YEAR-MO-DA
+      const timespan = queryTimespan; // day, week, month, quarter, year
+      const from = queryFromDate; // starting YEAR-MO-DA
+      const to = queryToDate; // ending YEAR-MO-DA
       const response = await fetch(
         `https://api.polygon.io/v2/aggs/ticker/${stockTicker}/range/${multiplier}/${timespan}/${from}/${to}?adjusted=true&sort=asc&limit=30&apiKey=${API_KEY}`
       );
@@ -91,6 +78,7 @@ const StockChart = ({ onStockPriceChange }) => {
       console.error("Error fetching stock data:", error);
     } finally {
       setLoading(false);
+      console.log("Final data state:", data);
     }
 
     if (stockTicker) {
@@ -139,20 +127,6 @@ const StockChart = ({ onStockPriceChange }) => {
   if (loading) {
     return <div>Loading...</div>;
   }
-
-  useEffect(() => {
-    if (stockTicker) {
-      fetchStockData();
-    }
-  }, [
-    stockTicker,
-    API_KEY,
-    queryTimespan,
-    queryFromDate,
-    queryToDate,
-    queryAdjusted,
-    queryTrigger,
-  ]);
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
