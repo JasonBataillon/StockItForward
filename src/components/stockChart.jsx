@@ -10,81 +10,89 @@ import {
 } from "recharts";
 
 const StockChart = ({ onStockPriceChange }) => {
+  console.log("StockChart component");
   const location = useLocation();
   const navigate = useNavigate();
   const {
     stockTicker,
     stockPrice: initialStockPrice,
-    stockName: initialStockName,
+    stockName,
   } = location.state || {};
 
   useEffect(() => {
     if (!stockTicker) {
       console.error("No stockTicker found in location state");
-      navigate("/stockSearch"); // Redirect to stock search if no stockTicker is found
+      navigate("/stockSearch");
     }
   }, [stockTicker, navigate]);
 
-  const [data, setData] = useState([]); //declaring hook for data storage
-  const [loading, setLoading] = useState(true); //declaring hook to indicate whether app is working instead of blank screening
+  const today = new Date().toISOString().split("T")[0];
+  const lastMonth = new Date(today);
+  lastMonth.setMonth(lastMonth.getMonth() - 1);
+  const formattedLastMonth = lastMonth.toISOString().split("T")[0];
+  console.log("today", today);
+
+  console.log("lastMonth", formattedLastMonth);
+
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [stockPrice, setStockPrice] = useState(initialStockPrice);
   const [marketCap, setMarketCap] = useState(null);
-  const [stockName] = useState(initialStockName); //at no point is setStockName used. I dont know why this is the case.
-
   const [watchlistMessage, setWatchlistMessage] = useState(null);
   const [queryTimespan, setQueryTimespan] = useState("day");
-  const [queryFromDate, setQueryFromDate] = useState("2023-01-01");
-  const [queryToDate, setQueryToDate] = useState("2023-12-31");
+  const [queryFromDate, setQueryFromDate] = useState(formattedLastMonth);
+  const [queryToDate, setQueryToDate] = useState(today);
   const [queryAdjusted, setQueryAdjusted] = useState(true);
   const [queryTrigger, setQueryTrigger] = useState(0);
 
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
 
-  const fetchStockData = async () => {
-    try {
-      const multiplier = 1; // Change this to get different time scale
-      const timespan = queryTimespan; // day, week, month, quarter, year
-      const from = queryFromDate; // starting YEAR-MO-DA
-      const to = queryToDate; // ending YEAR-MO-DA
-      const response = await fetch(
-        `https://api.polygon.io/v2/aggs/ticker/${stockTicker}/range/${multiplier}/${timespan}/${from}/${to}?adjusted=true&sort=asc&limit=30&apiKey=${API_KEY}`
-      );
+  useEffect(() => {
+    const fetchStockData = async () => {
+      try {
+        console.log("useEffect fetchStockData");
+        const multiplier = 1;
+        const response = await fetch(
+          `https://api.polygon.io/v2/aggs/ticker/${stockTicker}/range/${multiplier}/${queryTimespan}/${queryFromDate}/${queryToDate}?adjusted=${queryAdjusted}&sort=asc&limit=30&apiKey=${API_KEY}`
+        );
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Unauthorized: Check your API key");
-        } else {
-          throw new Error("Network response was not ok");
+        if (!response.ok) {
+          throw new Error(
+            response.status === 401
+              ? "Unauthorized: Check your API key"
+              : "Network response was not ok"
+          );
         }
-      }
 
-      const json = await response.json();
+        const json = await response.json();
 
-      if (json.results) {
-        const formattedData = json.results.map((item) => ({
-          date: new Date(item.t).toLocaleDateString(),
-          close: item.c,
-        }));
+        if (json.results) {
+          const formattedData = json.results.map((item) => ({
+            date: new Date(item.t).toLocaleDateString(),
+            close: item.c,
+          }));
 
-        setData(formattedData);
-        setStockPrice(json.results[0].c);
-        setMarketCap(json.results[0].marketCap || 0);
+          setData(formattedData);
+          setStockPrice(json.results[0]?.c || 0);
+          setMarketCap(json.results[0]?.marketCap || 0);
 
-        if (onStockPriceChange) {
-          onStockPriceChange(json.results[0].c);
+          if (onStockPriceChange) {
+            onStockPriceChange(json.results[0]?.c || 0);
+          }
         }
+      } catch (error) {
+        console.error("Error fetching stock data:", error);
+      } finally {
+        setLoading(false);
+        console.log("Final data state:", data);
       }
-    } catch (error) {
-      console.error("Error fetching stock data:", error);
-    } finally {
-      setLoading(false);
-      console.log("Final data state:", data);
-    }
+    };
 
     if (stockTicker) {
+      console.log("stockTicker ok");
       fetchStockData();
     }
-  };
+  }, [queryTrigger]);
 
   const saveStockToWatchlist = async () => {
     try {
@@ -107,19 +115,15 @@ const StockChart = ({ onStockPriceChange }) => {
         }),
       });
 
-      const result = await response.json();
-      console.log("Stock saved to watchlist:", result);
-
-      if (response.ok) {
-        setWatchlistMessage(
-          "This stock has been added into your watchlist!",
-          result
-        );
-      } else {
+      if (!response.ok) {
         throw new Error("Failed to save stock to watchlist");
       }
+
+      const result = await response.json();
+      console.log("Stock saved to watchlist:", result);
+      setWatchlistMessage("This stock has been added into your watchlist!");
     } catch (error) {
-      setWatchlistMessage(error, "Could it already be in your watchlist?");
+      setWatchlistMessage("Could it already be in your watchlist?");
       console.error("Error saving stock to watchlist:", error);
     }
   };
@@ -127,11 +131,6 @@ const StockChart = ({ onStockPriceChange }) => {
   if (loading) {
     return <div>Loading...</div>;
   }
-
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    setQueryTrigger((prev) => prev + 1);
-  };
 
   return (
     <div>
@@ -156,7 +155,13 @@ const StockChart = ({ onStockPriceChange }) => {
       </LineChart>
       <button onClick={saveStockToWatchlist}>Save to Watchlist</button>
       <div>{watchlistMessage}</div>
-      <form onSubmit={handleFormSubmit}>
+      <form
+        onSubmit={(e) => {
+          console.log("Form submitted *button clicked*");
+          e.preventDefault();
+          setQueryTrigger((prev) => prev + 1);
+        }}
+      >
         <label>Timespan:</label>
         <select
           id="timespan"
@@ -170,7 +175,7 @@ const StockChart = ({ onStockPriceChange }) => {
           <option value="year">Year</option>
         </select>
         <br />
-        <label htmlFor="date">From:</label>{" "}
+        <label htmlFor="fromDate">From:</label>
         <input
           type="date"
           id="fromDate"
@@ -178,22 +183,34 @@ const StockChart = ({ onStockPriceChange }) => {
           onChange={(e) => setQueryFromDate(e.target.value)}
         />
         <br />
-        <label htmlFor="date">To:</label>
+        <label htmlFor="toDate">To:</label>
         <input
           type="date"
           id="toDate"
           name="date"
-          onChange={(e) => setQueryToDate(e.target.value)}
+          onChange={(e) => {
+            const formattedDate = new Date(e.target.value)
+              .toISOString()
+              .split("T")[0];
+            setQueryToDate(formattedDate);
+          }}
         />
         <br />
-        <label>Adjusted True:</label>
+        <label>Adjusted:</label>
         <input
           type="checkbox"
           id="boolAdjusted"
           name="boolAdjusted"
-          onChange={(e) => setQueryAdjusted(e.target.checked)}
+          checked={queryAdjusted}
+          onChange={(e) => {
+            const formattedDate = new Date(e.target.value)
+              .toISOString()
+              .split("T")[0];
+            setQueryToDate(formattedDate);
+          }}
         />
         <br />
+        <button type="submit">Update Chart</button>
       </form>
     </div>
   );
