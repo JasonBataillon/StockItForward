@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useGetUserWatchlistQuery } from './usersSlice';
 import { fetchStockPrice } from '../api/stockUtils';
+import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate and useLocation
 
 const Users = () => {
   const { data, error, isLoading, refetch } = useGetUserWatchlistQuery();
   const [username, setUsername] = useState('');
   const [watchlist, setWatchlist] = useState([]);
   const [stockPrices, setStockPrices] = useState({});
+  const navigate = useNavigate(); // Initialize useNavigate
+  const location = useLocation(); // Initialize useLocation
 
   useEffect(() => {
     if (data) {
@@ -59,6 +62,16 @@ const Users = () => {
     // return () => clearInterval(interval);
   }, [watchlist, refetch]);
 
+  useEffect(() => {
+    // Trigger a refresh when the location changes
+    refetch();
+  }, [location, refetch]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // Remove the token from local storage
+    navigate('/login'); // Redirect to the login page
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -79,6 +92,7 @@ const Users = () => {
           </li>
         ))}
       </ul>
+      <button onClick={handleLogout}>Logout</button> {/* Add logout button */}
     </div>
   );
 };
