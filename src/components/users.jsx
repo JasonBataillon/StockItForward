@@ -128,7 +128,7 @@ const Users = () => {
   }
 
   if (error) {
-    return <div>Error loading user data</div>;
+    return <div>Please log in to see your watch list.</div>;
   }
 
   return (
@@ -169,7 +169,7 @@ const Users = () => {
           </li>
         ))}
       </ul>
-      <button onClick={handleLogout}>Logout</button> {/* Add logout button */}
+      <button onClick={handleLogout}>Logout</button>
     </div>
   );
 };
