@@ -77,6 +77,11 @@ const Users = () => {
     navigate('/login'); // Redirect to the login page
   };
 
+  const handleDeleteStock = (symbol) => {
+    setWatchlist(watchlist.filter((item) => item.stock.symbol !== symbol));
+    localStorage.removeItem(`stockData_${symbol}`);
+  };
+
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -166,6 +171,9 @@ const Users = () => {
                 )}
               </div>
             )}
+            <button onClick={() => handleDeleteStock(item.stock.symbol)}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>
