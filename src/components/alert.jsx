@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
-// import Modal from 'react-modal';
 import { fetchStockPrice } from "../api/stockUtils";
-
-// Modal.setAppElement("#root"); // Set the root element for accessibility
 
 const StockAlert = () => {
   const [price, setPrice] = useState(null);
