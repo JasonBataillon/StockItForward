@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { useGetUserWatchlistQuery } from './usersSlice';
-import { fetchStockPrice } from '../api/stockUtils';
-import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate and useLocation
-import './users.css'; // Import the CSS file
+import React, { useEffect, useState } from "react";
+import { useGetUserWatchlistQuery } from "./usersSlice";
+import { fetchStockPrice } from "../api/stockUtils";
+import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate and useLocation
+import "./users.css"; // Import the CSS file
 
 const Users = () => {
   const { data, error, isLoading, refetch } = useGetUserWatchlistQuery();
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState("");
   const [watchlist, setWatchlist] = useState([]);
   const [stockPrices, setStockPrices] = useState({});
-  const [searchQuery, setSearchQuery] = useState(''); // Add search query state
+  const [searchQuery, setSearchQuery] = useState(""); // Add search query state
   const [hoveredStock, setHoveredStock] = useState(null); // Add state for hovered stock
   const [relatedCompanies, setRelatedCompanies] = useState([]); // Add state for related companies
   const [noRelatedCompanies, setNoRelatedCompanies] = useState(false); // Add state for no related companies
@@ -26,7 +26,7 @@ const Users = () => {
 
   useEffect(() => {
     if (!API_KEY) {
-      console.error('Polygon API key is not defined');
+      console.error("Polygon API key is not defined");
       return;
     }
 
@@ -73,8 +73,8 @@ const Users = () => {
   }, [location, refetch]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove the token from local storage
-    navigate('/login'); // Redirect to the login page
+    localStorage.removeItem("token"); // Remove the token from local storage
+    navigate("/login"); // Redirect to the login page
   };
 
   const handleDeleteStock = async (symbol) => {
@@ -83,23 +83,23 @@ const Users = () => {
         `http://localhost:3000/watchlist/${symbol}`,
         {
           // Update the URL to match your backend
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`, // Assuming you use JWT for authentication
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming you use JWT for authentication
           },
         }
       );
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
 
       // Update the watchlist state after successful deletion
       setWatchlist(watchlist.filter((item) => item.stock.symbol !== symbol));
       localStorage.removeItem(`stockData_${symbol}`);
     } catch (error) {
-      console.error('Error deleting stock from watchlist:', error);
+      console.error("Error deleting stock from watchlist:", error);
     }
   };
 
@@ -120,7 +120,7 @@ const Users = () => {
           `https://api.polygon.io/v1/related-companies/${symbol}?apiKey=${API_KEY}`
         );
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error("Network response was not ok");
         }
         const data = await response.json();
         const relatedCompanies = data.results || [];
@@ -134,7 +134,7 @@ const Users = () => {
           })
         );
       } catch (error) {
-        console.error('Error fetching related companies:', error);
+        console.error("Error fetching related companies:", error);
       }
     }
   };
