@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { fetchStockPrice } from "../api/stockUtils";
+import React, { useState, useEffect } from 'react';
+import { fetchStockPrice } from '../api/stockUtils';
 
 const StockAlert = () => {
   const [price, setPrice] = useState(null);
   const [initialPrice, setInitialPrice] = useState(null);
   const [alert, setAlert] = useState(false);
-  const [stockTicker, setStockTicker] = useState("AAPL"); // Set a default stock ticker
+  const [stockTicker, setStockTicker] = useState('AAPL'); // Set a default stock ticker
 
   const handlePriceChange = (price) => {
     setPrice(price);
@@ -52,29 +52,16 @@ const StockAlert = () => {
       <h1>Stock Price Alerts</h1>
       <p>Stock: {stockTicker}</p>
       <p>
-        Current Price:{" "}
+        Current Price:{' '}
         {price !== null && !isNaN(price)
           ? `$${price.toFixed(2)}`
-          : "Loading..."}
+          : 'Loading...'}
       </p>
-      <Modal
-        isOpen={alert}
-        onRequestClose={() => setAlert(false)}
-        contentLabel="Stock Price Alert"
-      >
-        <h2>Stock Price Alert</h2>
-        <p>Stock: {stockTicker}</p>
-        <p>
-          Current Price:{" "}
-          {price !== null && !isNaN(price)
-            ? `$${price.toFixed(2)}`
-            : "Loading..."}
-        </p>
-        <p style={{ color: "red" }}>
+      {alert && (
+        <p style={{ color: 'red' }}>
           Alert: Stock price changed by 5% or more!
         </p>
-        <button onClick={() => setAlert(false)}>Close</button>
-      </Modal>
+      )}
     </div>
   );
 };
