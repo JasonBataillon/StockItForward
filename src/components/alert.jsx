@@ -23,15 +23,26 @@ const StockAlert = () => {
 
   useEffect(() => {
     const checkPriceChange = async () => {
+      const cachedData = localStorage.getItem(`stockData_${stockTicker}`);
+      if (cachedData) {
+        const parsedData = JSON.parse(cachedData);
+        handlePriceChange(parsedData.stockPrice);
+        return;
+      }
+
       const { stockPrice } = await fetchStockPrice(stockTicker, API_KEY);
       if (stockPrice !== null) {
         handlePriceChange(stockPrice);
+        localStorage.setItem(
+          `stockData_${stockTicker}`,
+          JSON.stringify({ stockPrice })
+        );
       }
     };
 
     // Initial check
     checkPriceChange();
-    const intervalId = setInterval(checkPriceChange, 300000); // Check every 5 minutes
+    const intervalId = setInterval(checkPriceChange, 600000); // Check every 10 minutes
 
     return () => clearInterval(intervalId);
   }, [initialPrice, stockTicker, API_KEY]);

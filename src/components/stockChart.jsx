@@ -13,7 +13,7 @@ const StockChart = ({ onStockPriceChange }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const {
-    stockTicker,
+    stockTicker: initialStockTicker,
     stockPrice: initialStockPrice,
     stockName: initialStockName,
   } = location.state || {};
@@ -34,13 +34,13 @@ const StockChart = ({ onStockPriceChange }) => {
 
   console.log("lastMonth", formattedLastMonth);
 
+  const [stockTicker, setStockTicker] = useState(initialStockTicker);
+  const [stockPrice, setStockPrice] = useState(initialStockPrice);
+  const [stockName, setStockName] = useState(initialStockName);
   const [data, setData] = useState([]); //declaring hook for data storage
   const [loading, setLoading] = useState(true); //declaring hook to indicate whether app is working instead of blank screening
-  const [stockPrice, setStockPrice] = useState(initialStockPrice);
   const [marketCap, setMarketCap] = useState(null);
-  const [stockName, setStockName] = useState(initialStockName); //setStockName never used, do we need this to be a usestate?
   const [watchlistMessage, setWatchlistMessage] = useState(null);
-
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
 
   useEffect(() => {
@@ -50,6 +50,18 @@ const StockChart = ({ onStockPriceChange }) => {
         const timespan = "day"; // day, week, month, quarter, year
         const from = formattedLastMonth; // starting YEAR-MO-DA
         const to = today; // ending YEAR-MO-DA
+
+        const cachedData = localStorage.getItem(`stockData_${stockTicker}`);
+        if (cachedData) {
+          const parsedData = JSON.parse(cachedData);
+          setData(parsedData.data);
+          setStockPrice(parsedData.stockPrice);
+          setMarketCap(parsedData.marketCap);
+          setStockName(parsedData.stockName);
+          setLoading(false);
+          return;
+        }
+
         const response = await fetch(
           `https://api.polygon.io/v2/aggs/ticker/${stockTicker}/range/${multiplier}/${timespan}/${from}/${to}?adjusted=true&sort=asc&limit=30&apiKey=${API_KEY}`
         );
@@ -74,6 +86,16 @@ const StockChart = ({ onStockPriceChange }) => {
           setStockPrice(json.results[0].c);
           setMarketCap(json.results[0].marketCap || 0);
 
+          localStorage.setItem(
+            `stockData_${stockTicker}`,
+            JSON.stringify({
+              data: formattedData,
+              stockPrice: json.results[0].c,
+              marketCap: json.results[0].marketCap || 0,
+              stockName: initialStockName,
+            })
+          );
+
           if (onStockPriceChange) {
             onStockPriceChange(json.results[0].c);
           }
@@ -82,14 +104,26 @@ const StockChart = ({ onStockPriceChange }) => {
         console.error("Error fetching stock data:", error);
       } finally {
         setLoading(false);
-        setLoading(false);
       }
     };
 
     if (stockTicker) {
       fetchStockData();
+    } else {
+      const cachedData = localStorage.getItem('lastStockSearch');
+      if (cachedData) {
+        const parsedData = JSON.parse(cachedData);
+        setStockTicker(parsedData.stockTicker);
+        setStockPrice(parsedData.stockPrice);
+        setStockName(parsedData.stockName);
+        setData(parsedData.data);
+        setMarketCap(parsedData.marketCap);
+        setLoading(false);
+      } else {
+        navigate('/stockSearch');
+      }
     }
-  }, [API_KEY, stockTicker, onStockPriceChange]);
+  }, [API_KEY, stockTicker, onStockPriceChange, initialStockName, navigate]);
 
   const saveStockToWatchlist = async () => {
     try {

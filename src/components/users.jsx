@@ -26,12 +26,24 @@ const Users = () => {
       const updatedPrices = {};
       for (const item of watchlist) {
         try {
-          const { stockPrice } = await fetchStockPrice(
-            item.stock.symbol,
-            API_KEY
+          const cachedData = localStorage.getItem(
+            `stockData_${item.stock.symbol}`
           );
-          if (stockPrice !== null) {
-            updatedPrices[item.stock.symbol] = stockPrice;
+          if (cachedData) {
+            const parsedData = JSON.parse(cachedData);
+            updatedPrices[item.stock.symbol] = parsedData.stockPrice;
+          } else {
+            const { stockPrice } = await fetchStockPrice(
+              item.stock.symbol,
+              API_KEY
+            );
+            if (stockPrice !== null) {
+              updatedPrices[item.stock.symbol] = stockPrice;
+              localStorage.setItem(
+                `stockData_${item.stock.symbol}`,
+                JSON.stringify({ stockPrice })
+              );
+            }
           }
         } catch (error) {
           console.error(error);
@@ -44,7 +56,7 @@ const Users = () => {
       fetchStockPrices();
     }
 
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
   }, [watchlist, refetch]);
 
   if (isLoading) {
