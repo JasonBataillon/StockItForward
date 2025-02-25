@@ -50,8 +50,14 @@ const StockSearch = () => {
       const { stockPrice, stockName } = await fetchStockPrice(ticker, API_KEY);
       if (stockPrice !== null) {
         console.log(`Fetched price for ${ticker}: $${stockPrice}`);
+        const stockData = {
+          stockTicker: ticker,
+          stockPrice,
+          stockName,
+        };
+        localStorage.setItem('lastStockSearch', JSON.stringify(stockData));
         navigate('/stockCharts', {
-          state: { stockTicker: ticker, stockPrice, stockName },
+          state: stockData,
         }); // Pass stock ticker, price, and name as state
       } else {
         console.error(`Failed to fetch price for ${ticker}`);
