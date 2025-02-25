@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Modal from 'react-modal';
 import { fetchStockPrice } from '../api/stockUtils';
-
-Modal.setAppElement('#root'); // Set the root element for accessibility
 
 const StockAlert = () => {
   const [price, setPrice] = useState(null);
@@ -60,24 +57,11 @@ const StockAlert = () => {
           ? `$${price.toFixed(2)}`
           : 'Loading...'}
       </p>
-      <Modal
-        isOpen={alert}
-        onRequestClose={() => setAlert(false)}
-        contentLabel="Stock Price Alert"
-      >
-        <h2>Stock Price Alert</h2>
-        <p>Stock: {stockTicker}</p>
-        <p>
-          Current Price:{' '}
-          {price !== null && !isNaN(price)
-            ? `$${price.toFixed(2)}`
-            : 'Loading...'}
-        </p>
+      {alert && (
         <p style={{ color: 'red' }}>
           Alert: Stock price changed by 5% or more!
         </p>
-        <button onClick={() => setAlert(false)}>Close</button>
-      </Modal>
+      )}
     </div>
   );
 };
