@@ -77,9 +77,30 @@ const Users = () => {
     navigate('/login'); // Redirect to the login page
   };
 
-  const handleDeleteStock = (symbol) => {
-    setWatchlist(watchlist.filter((item) => item.stock.symbol !== symbol));
-    localStorage.removeItem(`stockData_${symbol}`);
+  const handleDeleteStock = async (symbol) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/watchlist/${symbol}`,
+        {
+          // Update the URL to match your backend
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`, // Assuming you use JWT for authentication
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Update the watchlist state after successful deletion
+      setWatchlist(watchlist.filter((item) => item.stock.symbol !== symbol));
+      localStorage.removeItem(`stockData_${symbol}`);
+    } catch (error) {
+      console.error('Error deleting stock from watchlist:', error);
+    }
   };
 
   const handleSearchChange = (event) => {
