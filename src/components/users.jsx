@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useGetUserWatchlistQuery } from './usersSlice';
-import { fetchStockPrice } from '../api/stockUtils';
-import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate and useLocation
+import React, { useEffect, useState } from "react";
+import { useGetUserWatchlistQuery } from "./usersSlice";
+import { fetchStockPrice } from "../api/stockUtils";
+import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate and useLocation
 
 const Users = () => {
   const { data, error, isLoading, refetch } = useGetUserWatchlistQuery();
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState("");
   const [watchlist, setWatchlist] = useState([]);
   const [stockPrices, setStockPrices] = useState({});
   const navigate = useNavigate(); // Initialize useNavigate
@@ -21,7 +21,7 @@ const Users = () => {
   useEffect(() => {
     const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
     if (!API_KEY) {
-      console.error('Polygon API key is not defined');
+      console.error("Polygon API key is not defined");
       return;
     }
 
@@ -68,8 +68,13 @@ const Users = () => {
   }, [location, refetch]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove the token from local storage
-    navigate('/login'); // Redirect to the login page
+    localStorage.removeItem("token"); // Remove the token from local storage
+    navigate("/login"); // Redirect to the login page
+  };
+
+  const handleDeleteStock = (symbol) => {
+    setWatchlist(watchlist.filter((item) => item.stock.symbol !== symbol));
+    localStorage.removeItem(`stockData_${symbol}`);
   };
 
   if (isLoading) {
@@ -77,22 +82,24 @@ const Users = () => {
   }
 
   if (error) {
-    return <div>Error loading user data</div>;
+    return <div>Please log in to see your watch list.</div>;
   }
 
   return (
     <div>
-      <h1>Welcome {username}!</h1>
-      <h2>Your Watchlist:</h2>
+      <h1>{username}'s Watchlist</h1>
       <ul>
         {watchlist.map((item) => (
-          <li key={item.id}>
-            {item.stock.symbol} - {item.stock.name} - $
-            {stockPrices[item.stock.symbol] || item.stock.price}
+          <li key={item.stock.symbol}>
+            {item.stock.symbol} -{" "}
+            {stockPrices[item.stock.symbol] || "Loading..."}
+            <button onClick={() => handleDeleteStock(item.stock.symbol)}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>
-      <button onClick={handleLogout}>Logout</button> {/* Add logout button */}
+      <button onClick={handleLogout}>Logout</button>
     </div>
   );
 };
