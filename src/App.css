@@ -46,6 +46,7 @@ body {
   color: white;
 }
 
+/*Register/Login Pages*/
 .logregi {
   max-width: 350px;
   background: rgba(169, 169, 169, 0.411);
@@ -79,9 +80,20 @@ form button:hover {
   background: green;
 }
 
+/*Navigation Bar*/
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: black;
+  z-index: 1000;
+}
 nav ul {
   list-style: none;
   display: flex;
+  justify-content: space-around;
+  padding: 1rem;
 }
 nav a {
   color: rgba(60, 199, 18, 0.781);
@@ -90,4 +102,3 @@ nav a {
 nav a:hover {
   color: gold !important;
 }
-
