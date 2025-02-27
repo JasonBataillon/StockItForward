@@ -31,7 +31,7 @@ const StockChart = ({ onStockPriceChange }) => {
   const today = new Date().toISOString().split("T")[0];
   const lastMonth = new Date(today);
   lastMonth.setMonth(lastMonth.getMonth() - 1);
-  const formattedLastMonth = lastMonth.toISOString().split('T')[0];
+  const formattedLastMonth = lastMonth.toISOString().split("T")[0];
 
   const STOCK_DATA_KEY = `stockData_${stockTicker}`; // Define the key
 
@@ -39,7 +39,7 @@ const StockChart = ({ onStockPriceChange }) => {
     const fetchStockData = async () => {
       try {
         const multiplier = 1;
-        const timespan = 'day';
+        const timespan = "day";
         const from = formattedLastMonth;
         const to = today;
 
@@ -160,28 +160,28 @@ const StockChart = ({ onStockPriceChange }) => {
       setWatchlistMessage(
         "Error saving to watchlist. Could it already be in your watchlist? Else please Login or Register"
       );
-      console.error('Error saving stock to watchlist:', error);
+      console.error("Error saving stock to watchlist:", error);
     }
   };
 
   const handleBuyStock = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error('No token found');
+        throw new Error("No token found");
       }
 
       const stockData = JSON.parse(localStorage.getItem(STOCK_DATA_KEY));
       if (!stockData) {
-        throw new Error('No stock data found in local storage');
+        throw new Error("No stock data found in local storage");
       }
 
       const amount = buyAmount;
 
-      const response = await fetch('http://localhost:3000/user/buy', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3000/user/buy", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -191,16 +191,16 @@ const StockChart = ({ onStockPriceChange }) => {
       });
 
       const result = await response.json();
-      console.log('Stock bought:', result);
+      console.log("Stock bought:", result);
 
       if (response.ok) {
-        setWatchlistMessage('Stock bought successfully!');
+        setWatchlistMessage("Stock bought successfully!");
       } else {
-        throw new Error('Failed to buy stock');
+        throw new Error("Failed to buy stock");
       }
     } catch (error) {
-      setWatchlistMessage('You have insufficient funds!');
-      console.error('Error buying stock:', error);
+      setWatchlistMessage("You have insufficient funds!");
+      console.error("Error buying stock:", error);
     }
   };
 
@@ -219,7 +219,7 @@ const StockChart = ({ onStockPriceChange }) => {
       </p>
       <LineChart
         width={800}
-        height={800}
+        height={400}
         data={data}
         margin={{ top: 20, right: 20, bottom: 5, left: 0 }}
       >
@@ -229,17 +229,17 @@ const StockChart = ({ onStockPriceChange }) => {
         <YAxis domain={["auto", "dataMax + 5"]} />
         <Tooltip contentStyle={{ backgroundColor: "black" }} />
       </LineChart>
-      <button onClick={saveStockToWatchlist}>Save to Watchlist</button>
-      <div>{watchlistMessage}</div>
+      <input
+        type="number"
+        value={buyAmount}
+        onChange={(e) => setBuyAmount(e.target.value)}
+        placeholder="Enter amount to buy"
+      />
+      <button onClick={handleBuyStock}>Buy Stock</button>
       <div>
-        <input
-          type="number"
-          value={buyAmount}
-          onChange={(e) => setBuyAmount(e.target.value)}
-          placeholder="Enter amount to buy"
-        />
-        <button onClick={handleBuyStock}>Buy Stock</button>
+        <button onClick={saveStockToWatchlist}>Save to Watchlist</button>
       </div>
+      <div>{watchlistMessage}</div>
     </div>
   );
 };
