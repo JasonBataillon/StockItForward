@@ -1,6 +1,68 @@
+/* General styles for the users component */
+.users-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+.users-container h1,
+.users-container h2 {
+  color: white;
+}
+
+.users-container h1 {
+  font-size: 2em;
+  margin-bottom: 0.5em;
+}
+
+.users-container h2 {
+  font-size: 1.5em;
+  margin-bottom: 1em;
+}
+
+.users-container input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.users-container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.users-container ul li {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.users-container ul li button {
+  /* background-color: #007bff; */
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.users-container ul li button:hover {
+  /* background-color: #0056b3; */
+}
+
+/* Styles for the popup */
 .popup {
   position: fixed;
-  top: 50%;
+
+  top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 20px;
@@ -10,6 +72,9 @@
   width: 300px;
   max-height: 400px;
   overflow-y: auto;
+  background-color: black;
+  border-radius: 8px;
+  color: chartreuse
 }
 
 .popup h3 {
@@ -22,4 +87,23 @@
 
 .popup ul li {
   list-style-type: disc;
+}
+
+/* .watchlistCont {
+  color: chartreuse;
+  background-color: red;
+} */
+
+.button {
+  color: hsl(0, 6%, 3%);
+  background-color: rgba(60, 199, 18, 0.781)
+}
+
+.button.button {
+  color: hsl(0, 9%, 2%);
+  background-color: rgba(60, 199, 18, 0.781)
+}
+
+.put {
+  background-color: black;
 }
