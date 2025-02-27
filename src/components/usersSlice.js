@@ -16,6 +16,11 @@ const usersApi = api.injectEndpoints({
         method: 'GET',
       }),
       providesTags: [{ type: 'User' }],
+      transformResponse: (response) => ({
+        ...response,
+        wallet: response.wallet,
+        ownedStocks: response.ownedStocks, // Include owned stocks in the response
+      }),
     }),
   }),
 });

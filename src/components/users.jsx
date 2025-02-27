@@ -1,26 +1,31 @@
-import React, { useEffect, useState } from "react";
-import { useGetUserWatchlistQuery } from "./usersSlice";
-import { fetchStockPrice } from "../api/stockUtils";
-import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate and useLocation
-import "./users.css"; // Import the CSS file
+import React, { useEffect, useState } from 'react';
+import { useGetUserWatchlistQuery } from './usersSlice';
+import { fetchStockPrice } from '../api/stockUtils';
+import { useNavigate, useLocation } from 'react-router-dom';
+import './users.css';
 
 const Users = () => {
   const { data, error, isLoading, refetch } = useGetUserWatchlistQuery();
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState('');
+  const [wallet, setWallet] = useState(0);
   const [watchlist, setWatchlist] = useState([]);
+  const [ownedStocks, setOwnedStocks] = useState([]); // Add owned stocks state
   const [stockPrices, setStockPrices] = useState({});
-  const [searchQuery, setSearchQuery] = useState(""); // Add search query state
-  const [hoveredStock, setHoveredStock] = useState(null); // Add state for hovered stock
-  const [relatedCompanies, setRelatedCompanies] = useState([]); // Add state for related companies
-  const [noRelatedCompanies, setNoRelatedCompanies] = useState(false); // Add state for no related companies
-  const navigate = useNavigate(); // Initialize useNavigate
-  const location = useLocation(); // Initialize useLocation
+  const [searchQuery, setSearchQuery] = useState('');
+  const [hoveredStock, setHoveredStock] = useState(null);
+  const [relatedCompanies, setRelatedCompanies] = useState([]);
+  const [noRelatedCompanies, setNoRelatedCompanies] = useState(false);
+  const [sellAmount, setSellAmount] = useState(0); // Add state for sell amount
+  const navigate = useNavigate();
+  const location = useLocation();
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
 
   useEffect(() => {
     if (data) {
       setUsername(data.username);
+      setWallet(data.wallet);
       setWatchlist(data.watchlists);
+      setOwnedStocks(data.ownedStocks); // Set owned stocks
     }
   }, [data]);
 
@@ -63,18 +68,15 @@ const Users = () => {
     if (watchlist.length > 0) {
       fetchStockPrices();
     }
-
-    // return () => clearInterval(interval);
   }, [watchlist, refetch, API_KEY]);
 
   useEffect(() => {
-    // Trigger a refresh when the location changes
     refetch();
   }, [location, refetch]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Remove the token from local storage
-    navigate("/login"); // Redirect to the login page
+    localStorage.removeItem('token');
+    navigate('/login');
   };
 
   const handleDeleteStock = async (symbol) => {
@@ -82,11 +84,10 @@ const Users = () => {
       const response = await fetch(
         `http://localhost:3000/watchlist/${symbol}`,
         {
-          // Update the URL to match your backend
-          method: "DELETE",
+          method: 'DELETE',
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming you use JWT for authentication
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         }
       );
@@ -95,7 +96,6 @@ const Users = () => {
         throw new Error("Network response was not ok");
       }
 
-      // Update the watchlist state after successful deletion
       setWatchlist(watchlist.filter((item) => item.stock.symbol !== symbol));
       localStorage.removeItem(`stockData_${symbol}`);
     } catch (error) {
@@ -145,6 +145,40 @@ const Users = () => {
     setNoRelatedCompanies(false);
   };
 
+  const handleSellStock = async (symbol, amount) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found');
+      }
+
+      const response = await fetch('http://localhost:3000/user/sell', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          symbol,
+          amount,
+        }),
+      });
+
+      const result = await response.json();
+      console.log('Stock sold:', result);
+
+      if (response.ok) {
+        alert('Stock sold successfully!');
+        refetch();
+      } else {
+        throw new Error('Failed to sell stock');
+      }
+    } catch (error) {
+      alert('Error selling stock. Please try again.');
+      console.error('Error selling stock:', error);
+    }
+  };
+
   const filteredWatchlist = watchlist.filter((item) =>
     item.stock.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -160,6 +194,7 @@ const Users = () => {
   return (
     <div>
       <h1>Welcome {username}!</h1>
+      <h2>Your Wallet: ${wallet.toFixed(2)}</h2>
       <h2>Your Watchlist:</h2>
       <input
         type="text"
@@ -194,6 +229,38 @@ const Users = () => {
             )}
             <button onClick={() => handleDeleteStock(item.stock.symbol)}>
               Delete
+            </button>
+          </li>
+        ))}
+      </ul>
+      <h2>Your Owned Stocks:</h2>
+      <ul>
+        {ownedStocks.map((item) => (
+          <li key={item.id}>
+            {item.stock.symbol} - {item.stock.name} - {item.shares} shares - $
+            {stockPrices[item.stock.symbol] || item.stock.price} (
+            {((stockPrices[item.stock.symbol] || item.stock.price) -
+              item.avgPrice) *
+              item.shares >=
+            0
+              ? '+'
+              : '-'}
+            $
+            {(
+              ((stockPrices[item.stock.symbol] || item.stock.price) -
+                item.avgPrice) *
+              item.shares
+            ).toFixed(2)}
+            )
+            <input
+              type="number"
+              placeholder="Enter amount to sell"
+              onChange={(e) => setSellAmount(e.target.value)}
+            />
+            <button
+              onClick={() => handleSellStock(item.stock.symbol, sellAmount)}
+            >
+              Sell
             </button>
           </li>
         ))}
