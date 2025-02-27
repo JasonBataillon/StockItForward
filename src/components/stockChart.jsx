@@ -125,7 +125,43 @@ const StockChart = ({ onStockPriceChange }) => {
   ]); // added STOCK_DATA_KEY to dependency array
 
   const saveStockToWatchlist = async () => {
-    // ... (watchlist code remains the same)
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found');
+      }
+
+      const response = await fetch('http://localhost:3000/watchlist/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          stockTicker,
+          stockName,
+          stockPrice,
+          marketCap,
+        }),
+      });
+
+      const result = await response.json();
+      console.log('Stock saved to watchlist:', result);
+
+      if (response.ok) {
+        setWatchlistMessage(
+          'This stock has been added into your watchlist!',
+          result
+        );
+      } else {
+        throw new Error('Failed to save stock to watchlist');
+      }
+    } catch (error) {
+      setWatchlistMessage(
+        'Error saving to watchlist. Could it already be in your watchlist? Else please Login or Register'
+      );
+      console.error('Error saving stock to watchlist:', error);
+    }
   };
 
   const handleBuyStock = async () => {
