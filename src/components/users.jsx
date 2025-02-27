@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { useGetUserWatchlistQuery } from './usersSlice';
-import { fetchStockPrice } from '../api/stockUtils';
-import { useNavigate, useLocation } from 'react-router-dom';
-import './users.css';
+import React, { useEffect, useState } from "react";
+import { useGetUserWatchlistQuery } from "./usersSlice";
+import { fetchStockPrice } from "../api/stockUtils";
+import { useNavigate, useLocation } from "react-router-dom";
+import "./users.css";
 
 const Users = () => {
   const { data, error, isLoading, refetch } = useGetUserWatchlistQuery();
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState("");
   const [wallet, setWallet] = useState(0);
   const [watchlist, setWatchlist] = useState([]);
   const [ownedStocks, setOwnedStocks] = useState([]); // Add owned stocks state
   const [stockPrices, setStockPrices] = useState({});
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [hoveredStock, setHoveredStock] = useState(null);
   const [relatedCompanies, setRelatedCompanies] = useState([]);
   const [noRelatedCompanies, setNoRelatedCompanies] = useState(false);
@@ -75,8 +75,8 @@ const Users = () => {
   }, [location, refetch]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   const handleDeleteStock = async (symbol) => {
@@ -84,10 +84,10 @@ const Users = () => {
       const response = await fetch(
         `http://localhost:3000/watchlist/${symbol}`,
         {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -147,15 +147,15 @@ const Users = () => {
 
   const handleSellStock = async (symbol, amount) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error('No token found');
+        throw new Error("No token found");
       }
 
-      const response = await fetch('http://localhost:3000/user/sell', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3000/user/sell", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -165,17 +165,17 @@ const Users = () => {
       });
 
       const result = await response.json();
-      console.log('Stock sold:', result);
+      console.log("Stock sold:", result);
 
       if (response.ok) {
-        alert('Stock sold successfully!');
+        alert("Stock sold successfully!");
         refetch();
       } else {
-        throw new Error('Failed to sell stock');
+        throw new Error("Failed to sell stock");
       }
     } catch (error) {
-      alert('Error selling stock. Please try again.');
-      console.error('Error selling stock:', error);
+      alert("Error selling stock. Please try again.");
+      console.error("Error selling stock:", error);
     }
   };
 
@@ -192,11 +192,12 @@ const Users = () => {
   }
 
   return (
-    <div>
+    <div className="users-container">
       <h1>Welcome {username}!</h1>
       <h2>Your Wallet: ${wallet.toFixed(2)}</h2>
       <h2>Your Watchlist:</h2>
       <input
+        className="put"
         type="text"
         placeholder="Search watchlist..."
         value={searchQuery}
@@ -205,6 +206,7 @@ const Users = () => {
       <ul>
         {filteredWatchlist.map((item) => (
           <li
+            className="WatchlistCont"
             key={item.id}
             onMouseEnter={() => handleMouseEnter(item.stock.symbol)}
             onMouseLeave={handleMouseLeave}
@@ -220,14 +222,19 @@ const Users = () => {
                     <h3>Related Companies:</h3>
                     <ul>
                       {relatedCompanies.map((company) => (
-                        <li key={company.ticker}>{company.ticker}</li>
+                        <li className="WatchlistCont" key={company.ticker}>
+                          {company.ticker}
+                        </li>
                       ))}
                     </ul>
                   </>
                 )}
               </div>
             )}
-            <button onClick={() => handleDeleteStock(item.stock.symbol)}>
+            <button
+              className="button"
+              onClick={() => handleDeleteStock(item.stock.symbol)}
+            >
               Delete
             </button>
           </li>
@@ -236,15 +243,15 @@ const Users = () => {
       <h2>Your Owned Stocks:</h2>
       <ul>
         {ownedStocks.map((item) => (
-          <li key={item.id}>
+          <li className="WatchlistCont" key={item.id}>
             {item.stock.symbol} - {item.stock.name} - {item.shares} shares - $
             {stockPrices[item.stock.symbol] || item.stock.price} (
             {((stockPrices[item.stock.symbol] || item.stock.price) -
               item.avgPrice) *
               item.shares >=
             0
-              ? '+'
-              : '-'}
+              ? "+"
+              : "-"}
             $
             {(
               ((stockPrices[item.stock.symbol] || item.stock.price) -
@@ -258,6 +265,7 @@ const Users = () => {
               onChange={(e) => setSellAmount(e.target.value)}
             />
             <button
+              className="button"
               onClick={() => handleSellStock(item.stock.symbol, sellAmount)}
             >
               Sell
@@ -265,7 +273,9 @@ const Users = () => {
           </li>
         ))}
       </ul>
-      <button onClick={handleLogout}>Logout</button>
+      <button className="button" onClick={handleLogout}>
+        Logout
+      </button>
     </div>
   );
 };
