@@ -31,7 +31,7 @@ const Users = () => {
 
   useEffect(() => {
     if (!API_KEY) {
-      console.error('Polygon API key is not defined');
+      console.error("Polygon API key is not defined");
       return;
     }
 
@@ -93,13 +93,13 @@ const Users = () => {
       );
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
 
       setWatchlist(watchlist.filter((item) => item.stock.symbol !== symbol));
       localStorage.removeItem(`stockData_${symbol}`);
     } catch (error) {
-      console.error('Error deleting stock from watchlist:', error);
+      console.error("Error deleting stock from watchlist:", error);
     }
   };
 
@@ -120,7 +120,7 @@ const Users = () => {
           `https://api.polygon.io/v1/related-companies/${symbol}?apiKey=${API_KEY}`
         );
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error("Network response was not ok");
         }
         const data = await response.json();
         const relatedCompanies = data.results || [];
@@ -134,7 +134,7 @@ const Users = () => {
           })
         );
       } catch (error) {
-        console.error('Error fetching related companies:', error);
+        console.error("Error fetching related companies:", error);
       }
     }
   };

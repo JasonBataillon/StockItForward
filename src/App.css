@@ -40,3 +40,65 @@
 .read-the-docs {
   color: #888;
 }
+
+body {
+  background-color: black;
+  color: white;
+}
+
+/*Register/Login Pages*/
+.logregi {
+  max-width: 350px;
+  background: rgba(169, 169, 169, 0.411);
+  border-radius: 15%;
+  margin: 10px 10px 10px 10px;
+  padding: 15px;
+}
+
+form div {
+  display: flex;
+}
+
+form input {
+  padding: 5px;
+  border-radius: 5px;
+  margin-left: auto;
+  margin-bottom: 15px;
+}
+
+form label {
+  padding-left: 5px;
+}
+
+form button {
+  margin: 10px auto;
+  padding: 5px;
+  border-radius: 5px;
+  color: white;
+}
+form button:hover {
+  background: green;
+}
+
+/*Navigation Bar*/
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: black;
+  z-index: 1000;
+}
+nav ul {
+  list-style: none;
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+}
+nav a {
+  color: rgba(60, 199, 18, 0.781);
+  text-decoration: none !important;
+}
+nav a:hover {
+  color: gold !important;
+}

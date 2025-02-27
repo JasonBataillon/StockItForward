@@ -43,7 +43,7 @@ const Login = () => {
   };
 
   return (
-    <div>
+    <div className="logregi">
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         {/* username input field */}

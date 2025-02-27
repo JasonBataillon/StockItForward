@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   LineChart,
   Line,
@@ -7,7 +7,7 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-} from 'recharts';
+} from "recharts";
 
 const StockChart = ({ onStockPriceChange }) => {
   const location = useLocation();
@@ -28,7 +28,7 @@ const StockChart = ({ onStockPriceChange }) => {
   const [buyAmount, setBuyAmount] = useState(0);
 
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
   const lastMonth = new Date(today);
   lastMonth.setMonth(lastMonth.getMonth() - 1);
   const formattedLastMonth = lastMonth.toISOString().split('T')[0];
@@ -60,9 +60,9 @@ const StockChart = ({ onStockPriceChange }) => {
 
         if (!response.ok) {
           if (response.status === 401) {
-            throw new Error('Unauthorized: Check your API key');
+            throw new Error("Unauthorized: Check your API key");
           } else {
-            throw new Error('Network response was not ok');
+            throw new Error("Network response was not ok");
           }
         }
 
@@ -93,7 +93,7 @@ const StockChart = ({ onStockPriceChange }) => {
           }
         }
       } catch (error) {
-        console.error('Error fetching stock data:', error);
+        console.error("Error fetching stock data:", error);
       } finally {
         setLoading(false);
       }
@@ -102,7 +102,7 @@ const StockChart = ({ onStockPriceChange }) => {
     if (stockTicker) {
       fetchStockData();
     } else {
-      const cachedData = localStorage.getItem('lastStockSearch');
+      const cachedData = localStorage.getItem("lastStockSearch");
       if (cachedData) {
         const parsedData = JSON.parse(cachedData);
         setStockTicker(parsedData.stockTicker);
@@ -112,7 +112,7 @@ const StockChart = ({ onStockPriceChange }) => {
         setMarketCap(parsedData.marketCap);
         setLoading(false);
       } else {
-        navigate('/stockSearch');
+        navigate("/stockSearch");
       }
     }
   }, [
@@ -126,15 +126,15 @@ const StockChart = ({ onStockPriceChange }) => {
 
   const saveStockToWatchlist = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error('No token found');
+        throw new Error("No token found");
       }
 
-      const response = await fetch('http://localhost:3000/watchlist/add', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3000/watchlist/add", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -146,19 +146,19 @@ const StockChart = ({ onStockPriceChange }) => {
       });
 
       const result = await response.json();
-      console.log('Stock saved to watchlist:', result);
+      console.log("Stock saved to watchlist:", result);
 
       if (response.ok) {
         setWatchlistMessage(
-          'This stock has been added into your watchlist!',
+          "This stock has been added into your watchlist!",
           result
         );
       } else {
-        throw new Error('Failed to save stock to watchlist');
+        throw new Error("Failed to save stock to watchlist");
       }
     } catch (error) {
       setWatchlistMessage(
-        'Error saving to watchlist. Could it already be in your watchlist? Else please Login or Register'
+        "Error saving to watchlist. Could it already be in your watchlist? Else please Login or Register"
       );
       console.error('Error saving stock to watchlist:', error);
     }
@@ -214,8 +214,8 @@ const StockChart = ({ onStockPriceChange }) => {
       <div>{stockTicker}</div>
       <div>{stockName}</div>
       <p>
-        Current Price:{' '}
-        {stockPrice !== null ? `$${stockPrice.toFixed(2)}` : 'Loading...'}
+        Current Price:{" "}
+        {stockPrice !== null ? `$${stockPrice.toFixed(2)}` : "Loading..."}
       </p>
       <LineChart
         width={800}
@@ -223,11 +223,11 @@ const StockChart = ({ onStockPriceChange }) => {
         data={data}
         margin={{ top: 20, right: 20, bottom: 5, left: 0 }}
       >
-        <Line type="monotone" dataKey="close" stroke="#8884d8" />
+        <Line type="monotone" dataKey="close" stroke="green" />
         <CartesianGrid stroke="#ccc" />
         <XAxis dataKey="date" />
-        <YAxis domain={['auto', 'dataMax + 5']} />
-        <Tooltip />
+        <YAxis domain={["auto", "dataMax + 5"]} />
+        <Tooltip contentStyle={{ backgroundColor: "black" }} />
       </LineChart>
       <button onClick={saveStockToWatchlist}>Save to Watchlist</button>
       <div>{watchlistMessage}</div>
