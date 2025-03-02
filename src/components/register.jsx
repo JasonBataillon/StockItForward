@@ -1,35 +1,34 @@
-import { useState } from "react";
-import { usePostUserMutation } from "./usersSlice";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { usePostUserMutation } from './usersSlice';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const [postUser] = usePostUserMutation();
   const navigate = useNavigate();
 
-  // This state holds the form data: email and password
+  // State to manage form data
   const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
   });
-  //This state holds the message to be displayed to the user
-  const [message, setMessage] = useState("");
-  // This function updates the formData state whenever the user types in the input fields
+
+  const [message, setMessage] = useState('');
+
+  // Handle form input changes
   const handleChange = (e) => {
     setFormData({
-      ...formData, // Keep the existing data
-      [e.target.name]: e.target.value, // Update only the field being typed into
+      ...formData,
+      [e.target.name]: e.target.value,
     });
   };
 
-  // This function runs when the form is submitted
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevents the page from refreshing when the form is submitted
-    console.log("Registering user:", formData); // For now, just log the data to the console
-    // Later, this is where you'd send the data to your backend API
+    e.preventDefault();
+    console.log('Registering user:', formData);
     if (formData.password !== formData.confirmPassword) {
-      setMessage("Passwords do not match!");
+      setMessage('Passwords do not match!');
       return;
     }
     try {
@@ -38,24 +37,22 @@ const Register = () => {
         username: formData.username,
         password: formData.password,
       };
+      // Send registration request
       const response = await postUser(body).unwrap();
       console.log(response);
-      // console.log(response.error);
-      // if (response.error) {
-      //   throw new Error(response.error.data.message || "Registration failed");
-      // }
-      localStorage.setItem("token", response.token); // save token to local storage
+      localStorage.setItem('token', response.token);
 
-      console.log("User registered:", response);
+      console.log('User registered:', response);
       setMessage(
-        "Registration successful! You are now logged in. Redirecting..."
+        'Registration successful! You are now logged in. Redirecting...'
       );
+      // Redirect to home page after 2 seconds
       setTimeout(() => {
-        navigate("/");
-      }, 2000); // Redirect to login after 2 seconds
+        navigate('/');
+      }, 2000);
     } catch (error) {
-      console.error("Error:", error);
-      setMessage("Registration failed.");
+      console.error('Error:', error);
+      setMessage('Registration failed.');
     }
   };
 
@@ -73,19 +70,16 @@ const Register = () => {
             required
           />
         </div>
-        {/* Email Input Field */}
         <div>
           <label>Email:</label>
           <input
             type="email"
-            name="email" // Matches the key in formData
-            value={formData.email} // Controlled input bound to formData
-            onChange={handleChange} // Update formData when typing
-            required // Basic validation to ensure it's filled
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
           />
         </div>
-
-        {/* Password Input Field */}
         <div>
           <label>Password:</label>
           <input
@@ -96,7 +90,6 @@ const Register = () => {
             required
           />
         </div>
-        {/* Confirm Password Input Field */}
         <div>
           <label>Confirm Password:</label>
           <input
@@ -107,8 +100,6 @@ const Register = () => {
             required
           />
         </div>
-
-        {/* Submit Button */}
         <button type="submit" onClick={handleSubmit}>
           Register
         </button>

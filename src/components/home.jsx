@@ -1,21 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
+// Component to display market status
 const Home = () => {
   const [marketStatus, setMarketStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
-  const CACHE_KEY = "marketStatus";
-  const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
+  const CACHE_KEY = 'marketStatus';
+  const CACHE_DURATION = 10 * 60 * 1000;
 
   useEffect(() => {
+    // Function to fetch market status from the API
     const fetchMarketStatus = async () => {
       try {
         const response = await fetch(
           `https://api.polygon.io/v1/marketstatus/now?apiKey=${API_KEY}`
         );
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error('Network response was not ok');
         }
         const data = await response.json();
         const timestamp = new Date().getTime();
@@ -28,10 +30,12 @@ const Home = () => {
       }
     };
 
+    // Check if data is cached in local storage
     const cachedData = localStorage.getItem(CACHE_KEY);
     if (cachedData) {
       const { data, timestamp } = JSON.parse(cachedData);
       const now = new Date().getTime();
+      // Use cached data if it is still valid
       if (now - timestamp < CACHE_DURATION) {
         setMarketStatus(data);
         setLoading(false);
@@ -39,6 +43,7 @@ const Home = () => {
       }
     }
 
+    // Fetch market status if no valid cached data is found
     fetchMarketStatus();
   }, [API_KEY]);
 
@@ -57,8 +62,8 @@ const Home = () => {
         <div>
           <div>Market: {marketStatus.market}</div>
           <div>Server Time: {marketStatus.serverTime}</div>
-          <div>After Hours: {marketStatus.afterHours ? "Yes" : "No"}</div>
-          <div>Early Hours: {marketStatus.earlyHours ? "Yes" : "No"}</div>
+          <div>After Hours: {marketStatus.afterHours ? 'Yes' : 'No'}</div>
+          <div>Early Hours: {marketStatus.earlyHours ? 'Yes' : 'No'}</div>
           <h2>Currencies</h2>
           <div>Crypto: {marketStatus.currencies.crypto}</div>
           <div>Forex: {marketStatus.currencies.fx}</div>
