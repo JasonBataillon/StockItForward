@@ -1,23 +1,19 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import navigation hook
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-// Define the Login component
 const Login = () => {
-  // State to hold username and password input values
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
   const navigate = useNavigate();
-  // Handler for form submission
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent the default form submission behavior
-    // Here you would typically handle the login logic, such as sending the data to your server
+    event.preventDefault();
     try {
-      // const response = await fetch('https://stockitback.onrender.com/login', {
-      const response = await fetch("http://localhost:3000/login", {
-        method: "POST",
+      // Recreate line 13 with render link.
+      const response = await fetch('http://localhost:3000/login', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           username,
@@ -25,20 +21,21 @@ const Login = () => {
         }),
       });
       if (!response.ok) {
-        throw new Error("Login failed");
+        throw new Error('Login failed');
       }
 
+      // Parse the response data
       const data = await response.json();
-      console.log("Login successful:", data);
-      setMessage("Login successful! Redirecting...");
+      console.log('Login successful:', data);
+      setMessage('Login successful! Redirecting...');
       setTimeout(() => {
-        navigate("/");
-      }, 2000); // Redirect to home after 2 seconds
+        navigate('/');
+      }, 2000);
 
-      localStorage.setItem("token", data.token);
+      localStorage.setItem('token', data.token);
     } catch (error) {
-      console.error("Error:", error);
-      setMessage("Login failed.");
+      console.error('Error:', error);
+      setMessage('Login failed.');
     }
   };
 

@@ -1,19 +1,23 @@
 import React from 'react';
 
+// Catch JavaScript errors in child components
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false };
   }
 
+  // Update state when an error is caught
   static getDerivedStateFromError(error) {
     return { hasError: true };
   }
 
+  // Log error details
   componentDidCatch(error, errorInfo) {
     console.error('Error caught by ErrorBoundary:', error, errorInfo);
   }
 
+  // Render fallback UI if an error is caught, otherwise render children
   render() {
     if (this.state.hasError) {
       return <h1>Something went wrong.</h1>;

@@ -1,5 +1,6 @@
 import { api } from '../api/api';
 
+// Define endpoints for user-related API calls
 const usersApi = api.injectEndpoints({
   endpoints: (builder) => ({
     postUser: builder.mutation({
@@ -19,7 +20,7 @@ const usersApi = api.injectEndpoints({
       transformResponse: (response) => ({
         ...response,
         wallet: response.wallet,
-        ownedStocks: response.ownedStocks, // Include owned stocks in the response
+        ownedStocks: response.ownedStocks,
       }),
     }),
   }),

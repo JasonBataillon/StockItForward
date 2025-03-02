@@ -9,13 +9,13 @@ const Users = () => {
   const [username, setUsername] = useState("");
   const [wallet, setWallet] = useState(0);
   const [watchlist, setWatchlist] = useState([]);
-  const [ownedStocks, setOwnedStocks] = useState([]); // Add owned stocks state
+  const [ownedStocks, setOwnedStocks] = useState([]);
   const [stockPrices, setStockPrices] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredStock, setHoveredStock] = useState(null);
   const [relatedCompanies, setRelatedCompanies] = useState([]);
   const [noRelatedCompanies, setNoRelatedCompanies] = useState(false);
-  const [sellAmount, setSellAmount] = useState(0); // Add state for sell amount
+  const [sellAmount, setSellAmount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
@@ -25,13 +25,14 @@ const Users = () => {
       setUsername(data.username);
       setWallet(data.wallet);
       setWatchlist(data.watchlists);
-      setOwnedStocks(data.ownedStocks); // Set owned stocks
+      setOwnedStocks(data.ownedStocks);
     }
   }, [data]);
 
+  // Fetch stock prices for watchlist
   useEffect(() => {
     if (!API_KEY) {
-      console.error("Polygon API key is not defined");
+      console.error('Polygon API key is not defined');
       return;
     }
 
@@ -70,6 +71,7 @@ const Users = () => {
     }
   }, [watchlist, refetch, API_KEY]);
 
+  // Refetch data when location changes
   useEffect(() => {
     refetch();
   }, [location, refetch]);
@@ -79,6 +81,7 @@ const Users = () => {
     navigate("/login");
   };
 
+  // Deleted stock from watchlist
   const handleDeleteStock = async (symbol) => {
     try {
       const response = await fetch(
@@ -93,20 +96,22 @@ const Users = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error('Network response was not ok');
       }
 
       setWatchlist(watchlist.filter((item) => item.stock.symbol !== symbol));
       localStorage.removeItem(`stockData_${symbol}`);
     } catch (error) {
-      console.error("Error deleting stock from watchlist:", error);
+      console.error('Error deleting stock from watchlist:', error);
     }
   };
 
+  // Handle search query change
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
 
+  // Handle mouse enter event to fetch related companies
   const handleMouseEnter = async (symbol) => {
     setHoveredStock(symbol);
     const cachedData = localStorage.getItem(`relatedCompanies_${symbol}`);
@@ -120,7 +125,7 @@ const Users = () => {
           `https://api.polygon.io/v1/related-companies/${symbol}?apiKey=${API_KEY}`
         );
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error('Network response was not ok');
         }
         const data = await response.json();
         const relatedCompanies = data.results || [];
@@ -134,7 +139,7 @@ const Users = () => {
           })
         );
       } catch (error) {
-        console.error("Error fetching related companies:", error);
+        console.error('Error fetching related companies:', error);
       }
     }
   };
@@ -165,7 +170,6 @@ const Users = () => {
       });
 
       const result = await response.json();
-      console.log("Stock sold:", result);
 
       if (response.ok) {
         alert("Stock sold successfully!");
@@ -179,6 +183,7 @@ const Users = () => {
     }
   };
 
+  // Filter watchlist based on search query
   const filteredWatchlist = watchlist.filter((item) =>
     item.stock.name.toLowerCase().includes(searchQuery.toLowerCase())
   );

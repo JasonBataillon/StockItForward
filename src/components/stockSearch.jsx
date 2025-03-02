@@ -13,12 +13,11 @@ const StockSearch = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [ranOnce, setRanOnce] = useState(false);
-  const [buyAmount, setBuyAmount] = useState(0);
   const [buyAmounts, setBuyAmounts] = useState({});
   const navigate = useNavigate();
 
+  // Load cached search results on component mount
   useEffect(() => {
-    // Retrieve results from localStorage on component mount
     const storedResults = localStorage.getItem("stockSearchResults");
     if (storedResults) {
       setResults(JSON.parse(storedResults));
@@ -46,7 +45,6 @@ const StockSearch = () => {
       const fetchedResults = result.results || [];
       setResults(fetchedResults);
 
-      // Store results in localStorage
       localStorage.setItem(
         "stockSearchResults",
         JSON.stringify(fetchedResults)
@@ -58,6 +56,7 @@ const StockSearch = () => {
     }
   };
 
+  // Handle stock selection and navigate to stock charts
   const handleStockSelect = async (ticker) => {
     try {
       const { stockPrice, stockName } = await fetchStockPrice(ticker, API_KEY);
@@ -115,7 +114,7 @@ const StockSearch = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          stockData: stockData, // Include stockData
+          stockData: stockData,
           amount: amount,
         }),
       });
