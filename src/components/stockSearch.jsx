@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { fetchStockPrice } from '../api/stockUtils';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { fetchStockPrice } from "../api/stockUtils";
 
 const StockSearch = () => {
   const API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
   if (!API_KEY) {
-    throw new Error('API key is missing');
+    throw new Error("API key is missing");
   }
 
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -18,7 +18,7 @@ const StockSearch = () => {
 
   // Load cached search results on component mount
   useEffect(() => {
-    const storedResults = localStorage.getItem('stockSearchResults');
+    const storedResults = localStorage.getItem("stockSearchResults");
     if (storedResults) {
       setResults(JSON.parse(storedResults));
     }
@@ -31,21 +31,22 @@ const StockSearch = () => {
     setLoading(true);
     setRanOnce(true);
 
-    localStorage.removeItem('stockSearchResults');
+    // Clear previous results from localStorage
+    localStorage.removeItem("stockSearchResults");
 
     try {
       const response = await fetch(
         `https://api.polygon.io/v3/reference/tickers?search=${query}&apiKey=${API_KEY}`
       );
       if (!response.ok) {
-        throw new Error('Failed to fetch data');
+        throw new Error("Failed to fetch data");
       }
       const result = await response.json();
       const fetchedResults = result.results || [];
       setResults(fetchedResults);
 
       localStorage.setItem(
-        'stockSearchResults',
+        "stockSearchResults",
         JSON.stringify(fetchedResults)
       );
     } catch (err) {
@@ -66,8 +67,8 @@ const StockSearch = () => {
           stockPrice,
           stockName,
         };
-        localStorage.setItem('lastStockSearch', JSON.stringify(stockData));
-        navigate('/stockCharts', {
+        localStorage.setItem("lastStockSearch", JSON.stringify(stockData));
+        navigate("/stockCharts", {
           state: stockData,
         });
       } else {
@@ -88,15 +89,15 @@ const StockSearch = () => {
   const handleBuyStock = async (ticker) => {
     const amount = buyAmounts[ticker] || 0;
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error('No token found');
+        throw new Error("No token found");
       }
 
       const { stockPrice, stockName } = await fetchStockPrice(ticker, API_KEY);
 
       if (stockPrice === null) {
-        alert('Could not retrieve stock price. Please try again.');
+        alert("Could not retrieve stock price. Please try again.");
         return;
       }
 
@@ -106,10 +107,10 @@ const StockSearch = () => {
         stockPrice: stockPrice,
       };
 
-      const response = await fetch('http://localhost:3000/user/buy', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3000/user/buy", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -119,16 +120,16 @@ const StockSearch = () => {
       });
 
       const result = await response.json();
-      console.log('Stock bought:', result);
+      console.log("Stock bought:", result);
 
       if (response.ok) {
-        alert('Stock bought successfully!');
+        alert("Stock bought successfully!");
       } else {
-        throw new Error('Failed to buy stock');
+        throw new Error("Failed to buy stock");
       }
     } catch (error) {
-      alert('Error buying stock. Please try again.');
-      console.error('Error buying stock:', error);
+      alert("Error buying stock. Please try again.");
+      console.error("Error buying stock:", error);
     }
   };
 
@@ -149,28 +150,26 @@ const StockSearch = () => {
       {results.length > 0 && (
         <div>
           <h3>Results:</h3>
-          <ul>
+          <ul className="stockSearch">
             {results.map((stock) => (
               <li key={stock.ticker}>
                 <strong>
-                  {stock.name}
                   <button onClick={() => handleStockSelect(stock.ticker)}>
                     {stock.ticker}
                   </button>
+                  {" " + stock.name + " "}
                 </strong>
-                <div>
-                  <input
-                    type="number"
-                    value={buyAmounts[stock.ticker] || ''}
-                    onChange={(e) =>
-                      handleBuyAmountChange(stock.ticker, e.target.value)
-                    }
-                    placeholder="Enter amount to buy"
-                  />
-                  <button onClick={() => handleBuyStock(stock.ticker)}>
-                    Buy Stock
-                  </button>
-                </div>
+                <input
+                  type="number"
+                  value={buyAmounts[stock.ticker] || ""}
+                  onChange={(e) =>
+                    handleBuyAmountChange(stock.ticker, e.target.value)
+                  }
+                  placeholder="Enter amount to buy"
+                />
+                <button onClick={() => handleBuyStock(stock.ticker)}>
+                  Buy Stock
+                </button>
               </li>
             ))}
           </ul>
