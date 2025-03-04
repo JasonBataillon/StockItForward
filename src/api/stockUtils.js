@@ -1,5 +1,6 @@
 export const fetchStockPrice = async (query, API_KEY) => {
   try {
+    // Fetch the previous day's stock price
     const response = await fetch(
       `https://api.polygon.io/v2/aggs/ticker/${query}/prev?adjusted=true&apiKey=${API_KEY}`
     );
@@ -7,16 +8,16 @@ export const fetchStockPrice = async (query, API_KEY) => {
       throw new Error('Network response was not ok');
     }
     const data = await response.json();
-    console.log('API response:', data); // Log the entire response
 
+    // Check if the response contains results
     if (!data.results || data.results.length === 0) {
       throw new Error('No results found in API response');
     }
 
-    const stockPrice = data.results[0].c; // 'c' is the close price
-    console.log('Stock price:', stockPrice);
+    // Extract the closing price from the results
+    const stockPrice = data.results[0].c;
 
-    // Fetch stock name
+    // Fetch the stock name
     const nameResponse = await fetch(
       `https://api.polygon.io/v3/reference/tickers/${query}?apiKey=${API_KEY}`
     );

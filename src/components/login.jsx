@@ -1,14 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import navigation hook
+import { useNavigate } from "react-router-dom";
 
-// Define the Login component
 const Login = () => {
-  // State to hold username and password input values
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-  // Handler for form submission
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent the default form submission behavior
     // Here you would typically handle the login logic, such as sending the data to your server
@@ -31,12 +28,13 @@ const Login = () => {
         throw new Error("Login failed");
       }
 
+      // Parse the response data
       const data = await response.json();
       console.log("Login successful:", data);
       setMessage("Login successful! Redirecting...");
       setTimeout(() => {
         navigate("/");
-      }, 2000); // Redirect to home after 2 seconds
+      }, 2000);
 
       localStorage.setItem("token", data.token);
     } catch (error) {

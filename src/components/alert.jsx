@@ -5,8 +5,9 @@ const StockAlert = () => {
   const [price, setPrice] = useState(null);
   const [initialPrice, setInitialPrice] = useState(null);
   const [alert, setAlert] = useState(false);
-  const [stockTicker, setStockTicker] = useState('AAPL'); // Set a default stock ticker
+  const [stockTicker, setStockTicker] = useState('AAPL');
 
+  // Function to handle price changes and set alert if price changes by 5% or more
   const handlePriceChange = (price) => {
     setPrice(price);
     if (initialPrice === null) {
@@ -30,6 +31,7 @@ const StockAlert = () => {
         return;
       }
 
+      // Fetch stock price if not cached
       const { stockPrice } = await fetchStockPrice(stockTicker, API_KEY);
       if (stockPrice !== null) {
         handlePriceChange(stockPrice);
@@ -40,10 +42,11 @@ const StockAlert = () => {
       }
     };
 
-    // Initial check
+    // Check price change on component mount and set interval to check every 10 minutes
     checkPriceChange();
-    const intervalId = setInterval(checkPriceChange, 600000); // Check every 10 minutes
+    const intervalId = setInterval(checkPriceChange, 600000);
 
+    // Clear interval on component unmount
     return () => clearInterval(intervalId);
   }, [initialPrice, stockTicker, API_KEY]);
 

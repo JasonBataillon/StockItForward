@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link } from 'react-router-dom';
 const Navbar = () => {
   return (
     <nav>
@@ -6,38 +6,32 @@ const Navbar = () => {
         <li>
           <Link className="home" to="/">
             Home
-          </Link>{" "}
-          {/* Link to Home page */}
+          </Link>
         </li>
         <li>
           <Link className="stockSearch" to="/stockSearch">
             Stock Search
-          </Link>{" "}
-          {/* Link to Stock Search page */}
+          </Link>
         </li>
         <li>
-          <Link className="stockCharts" to={"/stockCharts"}>
+          <Link className="stockCharts" to={'/stockCharts'}>
             Stock Charts
-          </Link>{" "}
-          {/* Link to Stock Charts page */}
+          </Link>
         </li>
         <li>
           <Link className="register" to="/register">
             Register
-          </Link>{" "}
-          {/* Link to Register page */}
+          </Link>
         </li>
         <li>
           <Link className="login" to="/login">
             Login
-          </Link>{" "}
-          {/* Link to Login page */}
+          </Link>
         </li>
         <li>
           <Link className="users" to="/users">
             User Page
-          </Link>{" "}
-          {/* Link to User page */}
+          </Link>
         </li>
       </ul>
     </nav>

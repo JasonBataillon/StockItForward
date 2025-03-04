@@ -102,3 +102,26 @@ nav a {
 nav a:hover {
   color: gold !important;
 }
+
+.stockSearch {
+  text-align: left !important;
+}
+.stockSearch li {
+  display: block;
+}
+.stockSearch li strong {
+  left: 10%;
+}
+
+.stockSearch input {
+  padding: 5px;
+  border-radius: 5px;
+  margin-left: auto;
+  margin-bottom: 15px;
+  padding-right: -500px;
+  width: 135px;
+}
+
+h1 {
+  
+}
